@@ -127,6 +127,637 @@ const DATABRICKS_MODEL_ENDPOINT = 'databricks-meta-llama-3-1-70b-instruct'; // �
  * 随時追加・編集可能
  */
 const TRANSLATION_EXCLUSIONS = {
+// Databricks 公式
+'4X-Large': '4X-Large',
+'ACL': 'ACL',
+'ACID': 'ACID',
+'2X-Small': '2X-Small',
+'2X-Large': '2X-Large',
+'ADLS': 'ADLS',
+'3X-Large': '3X-Large',
+'ACR': 'ACR',
+'Apache Kudu': 'Apache Kudu',
+'Apache Spark™': 'Apache Spark™',
+'Apache Software Foundation': 'Apache Software Foundation',
+'Apache': 'Apache',
+'ARNs': 'ARNs',
+'APIs': 'APIs',
+'ASF': 'ASF',
+'Apache Hive': 'Apache Hive',
+'Auto Loader': 'Auto Loader',
+'AWS Marketplace': 'AWS Marketplace',
+'Azure Data Lake Storage Gen2': 'Azure Data Lake Storage Gen2',
+'Apache Kylin': 'Apache Kylin',
+'Apache Spark': 'Apache Spark',
+'Avro': 'Avro',
+'AVRO': 'AVRO',
+'Azure': 'Azure',
+'AWS': 'AWS',
+'Azure Synapse Analytics': 'Azure Synapse Analytics',
+'Azure SQL Data Warehouse': 'Azure SQL Data Warehouse',
+'Azure Databricks': 'Azure Databricks',
+'Bayesian': 'Bayesian',
+'BINARYFILE': 'BINARYFILE',
+'Azure Key Vault': 'Azure Key Vault',
+'Azure Blob': 'Azure Blob',
+'Azure Event Hub': 'Azure Event Hub',
+'BigQuery': 'BigQuery',
+'Bokeh': 'Bokeh',
+'Cassandra': 'Cassandra',
+'CDC': 'CDC',
+'Boxplot': 'Boxplot',
+'Bitbucket': 'Bitbucket',
+'CIDR': 'CIDR',
+'Azure Cosmos DB': 'Azure Cosmos DB',
+'ARN': 'ARN',
+'Azure Data Lake Storage Gen1': 'Azure Data Lake Storage Gen1',
+'Azure Active Directory': 'Azure Active Directory',
+'API': 'API',
+'Azure Synapse': 'Azure Synapse',
+'Berkeley Packet Filter': 'Berkeley Packet Filter',
+'Conda': 'Conda',
+'BPF': 'BPF',
+'CI/CD': 'CI/CD',
+'CNN': 'CNN',
+'Azure Data Lake Store': 'Azure Data Lake Store',
+'CRAN': 'CRAN',
+'Community Edition': 'Community Edition',
+'Couchbase': 'Couchbase',
+'Data Explorer': 'Data Explorer',
+'CSV': 'CSV',
+'Databricks Community Edition': 'Databricks Community Edition',
+'Databricks Delta': 'Databricks Delta',
+'Databricks Filesystem': 'Databricks Filesystem',
+'Databricks DataInsight': 'Databricks DataInsight',
+'Databricks': 'Databricks',
+'Databricks Machine Learning': 'Databricks Machine Learning',
+'Databricks Data Analytics Platform': 'Databricks Data Analytics Platform',
+'DataFrames': 'DataFrames',
+'DBU': 'DBU',
+'Databricks Runtime': 'Databricks Runtime',
+'Databricks Platform Free Trial': 'Databricks Platform Free Trial',
+'Databricks Container Services': 'Databricks Container Services',
+'DataFrame': 'DataFrame',
+'data scientists': 'data scientists',
+'Databricks SQL': 'Databricks SQL',
+'Delta': 'Delta',
+'Delta Lake': 'Delta Lake',
+'Delta Sharing': 'Delta Sharing',
+'Databricks Workflows': 'Databricks Workflows',
+'DBFS': 'DBFS',
+'DevOps': 'DevOps',
+'DLT': 'DLT',
+'Donut': 'Donut',
+'Docker': 'Docker',
+'Docker Container Services': 'Docker Container Services',
+'eBay': 'eBay',
+'Delta Engine': 'Delta Engine',
+'EC2': 'EC2',
+'Amazon ECR': 'Amazon ECR',
+'Databricks Workspace': 'Databricks Workspace',
+'EMR': 'EMR',
+'Elasticsearch': 'Elasticsearch',
+'ETL': 'ETL',
+'GCS': 'GCS',
+'Excel': 'Excel',
+'GATK': 'GATK',
+'Google Cloud Storage': 'Google Cloud Storage',
+'GitHub': 'GitHub',
+'Hadoop': 'Hadoop',
+'HIPAA': 'HIPAA',
+'Hive': 'Hive',
+'eQTL': 'eQTL',
+'GovCloud': 'GovCloud',
+'Git': 'Git',
+'Google Spreadsheets': 'Google Spreadsheets',
+'Hive SerDes': 'Hive SerDes',
+'HMS': 'HMS',
+'Horovod': 'Horovod',
+'Hugging Face': 'Hugging Face',
+'IAM': 'IAM',
+'HP': 'HP',
+'IoT': 'IoT',
+'Java': 'Java',
+'JAR': 'JAR',
+'iPass': 'iPass',
+'JVM': 'JVM',
+'JSON': 'JSON',
+'Kafka': 'Kafka',
+'GraphX': 'GraphX',
+'HDFS': 'HDFS',
+'Fivetran': 'Fivetran',
+'GCP': 'GCP',
+'Lambda': 'Lambda',
+'Kinesis': 'Kinesis',
+'LZO': 'LZO',
+'MapReduce': 'MapReduce',
+'HomeAway': 'HomeAway',
+'Keras': 'Keras',
+'Hive metastore': 'Hive metastore',
+'IT': 'IT',
+'Looker': 'Looker',
+'MLlib': 'MLlib',
+'Maven': 'Maven',
+'Koalas': 'Koalas',
+'KMS': 'KMS',
+'MongoDB': 'MongoDB',
+'MongoDB Connector for Spark': 'MongoDB Connector for Spark',
+'Microsoft': 'Microsoft',
+'MLOps': 'MLOps',
+'Netflix': 'Netflix',
+'NoSQL': 'NoSQL',
+'Nephos': 'Nephos',
+'NIST': 'NIST',
+'MongoDB Atlas': 'MongoDB Atlas',
+'NumPy': 'NumPy',
+'MySQL': 'MySQL',
+'ODBC': 'ODBC',
+'Matplotlib': 'Matplotlib',
+'MLflow': 'MLflow',
+'ORC': 'ORC',
+'Pandas': 'Pandas',
+'Partner Connect': 'Partner Connect',
+'Partner Hub': 'Partner Hub',
+'Parquet': 'Parquet',
+'PARQUET': 'PARQUET',
+'Pandas DataFrame': 'Pandas DataFrame',
+'Photon': 'Photon',
+'PHI': 'PHI',
+'PR': 'PR',
+'PostgreSQL': 'PostgreSQL',
+'PySpark': 'PySpark',
+'PyPI': 'PyPI',
+'PyCharm': 'PyCharm',
+'Qlik Sense': 'Qlik Sense',
+'Python': 'Python',
+'R': 'R',
+'PyTorch': 'PyTorch',
+'Regeneron': 'Regeneron',
+'Redshift': 'Redshift',
+'ROC': 'ROC',
+'RStudio': 'RStudio',
+'repo': 'repo',
+'SAML': 'SAML',
+'SCD': 'SCD',
+'Plotly': 'Plotly',
+'RDBMS': 'RDBMS',
+'RDD': 'RDD',
+'SerDes': 'SerDes',
+'Scala': 'Scala',
+'S3': 'S3',
+'Redash': 'Redash',
+'Runtime': 'Runtime',
+'REST': 'REST',
+'SCIM': 'SCIM',
+'Spark UI': 'Spark UI',
+'Spark SQL': 'Spark SQL',
+'SparkHub': 'SparkHub',
+'Spark': 'Spark',
+'Scikit-Learn': 'Scikit-Learn',
+'SLA': 'SLA',
+'SparkR': 'SparkR',
+'SQL': 'SQL',
+'Sparklyr': 'Sparklyr',
+'SSD': 'SSD',
+'Repos': 'Repos',
+'SaaS': 'SaaS',
+'Tableau': 'Tableau',
+'r4.4large': 'r4.4large',
+'Synapse': 'Synapse',
+'Terraform': 'Terraform',
+'Snowflake': 'Snowflake',
+'Spark API': 'Spark API',
+'TensorBoard': 'TensorBoard',
+'TensorFlow': 'TensorFlow',
+'TEXT': 'TEXT',
+'Tungsten': 'Tungsten',
+'unified analytics': 'unified analytics',
+'Unity Catalog': 'Unity Catalog',
+'Unified Data Analytics': 'Unified Data Analytics',
+'X-Small': 'X-Small',
+'XGBoost': 'XGBoost',
+'VPC': 'VPC',
+'Yahoo': 'Yahoo',
+'X-Large': 'X-Large',
+'Kudu': 'Kudu',
+'Kylin': 'Kylin',
+'Model Registry': 'Model Registry',
+'azure': 'azure',
+'Workspace Model Registry': 'Workspace Model Registry',
+'MLflow Model Registry': 'MLflow Model Registry',
+'Databricks Marketplace': 'Databricks Marketplace',
+'SQL Server': 'SQL Server',
+'CLI': 'CLI',
+'Resilient Distributed Datasets': 'Resilient Distributed Datasets',
+'write.parquet': 'write.parquet',
+'write.orc': 'write.orc',
+'write.text': 'write.text',
+'read.json': 'read.json',
+'read.parquet': 'read.parquet',
+'read.orc': 'read.orc',
+'read.text': 'read.text',
+'read.jdbc': 'read.jdbc',
+'change data feed': 'change data feed',
+'external location': 'external location',
+'Low-Med': 'Low-Med',
+'Med-High': 'Med-High',
+'CAN ATTACH TO': 'CAN ATTACH TO',
+'CAN RESTART': 'CAN RESTART',
+'production': 'production',
+'warehouse': 'warehouse',
+'Amazon': 'Amazon',
+'Airflow': 'Airflow',
+'Databricks Repo': 'Databricks Repo',
+'SDK': 'SDK',
+'SBT': 'SBT',
+'DHCP': 'DHCP',
+'FSCK': 'FSCK',
+'PowerShell': 'PowerShell',
+'zsh': 'zsh',
+'IaC': 'IaC',
+'Msck': 'Msck',
+'TSV': 'TSV',
+'SSL': 'SSL',
+'UID': 'UID',
+'PWD': 'PWD',
+'UDF': 'UDF',
+'rh': 'rh',
+'ML': 'ML',
+'LTS': 'LTS',
+'write.json': 'write.json',
+'COPY INTO': 'COPY INTO',
+'Lakehouse Monitoring': 'Lakehouse Monitoring',
+'Petastorm': 'Petastorm',
+'Hyperopt': 'Hyperopt',
+'Prophet': 'Prophet',
+'LightGBM': 'LightGBM',
+'ARIMA': 'ARIMA',
+'Auto-ARIMA': 'Auto-ARIMA',
+'Shapley': 'Shapley',
+'sklearn': 'sklearn',
+'scikit-learn': 'scikit-learn',
+'PyTorch Lightning': 'PyTorch Lightning',
+'HorovodRunner': 'HorovodRunner',
+'TorchDistributor': 'TorchDistributor',
+'John Snow Labs': 'John Snow Labs',
+'BERT': 'BERT',
+'LangChain': 'LangChain',
+'ALTER CATALOG': 'ALTER CATALOG',
+'ALTER CREDENTIAL': 'ALTER CREDENTIAL',
+'ALTER DATABASE': 'ALTER DATABASE',
+'ALTER LOCATION': 'ALTER LOCATION',
+'ALTER PROVIDER': 'ALTER PROVIDER',
+'ALTER RECIPIENT': 'ALTER RECIPIENT',
+'ALTER TABLE': 'ALTER TABLE',
+'lineage': 'lineage',
+'customer-managed VPC': 'customer-managed VPC',
+'billable usage log': 'billable usage log',
+'billable usage': 'billable usage',
+'Boto': 'Boto',
+'Z-order': 'Z-order',
+'Z-ordering': 'Z-ordering',
+'source': 'source',
+'ALTER SCHEMA': 'ALTER SCHEMA',
+'ALTER SHARE': 'ALTER SHARE',
+'ALTER VIEW': 'ALTER VIEW',
+'Well-Architected': 'Well-Architected',
+'Google Cloud Architecture Framework': 'Google Cloud Architecture Framework',
+'COMMENT ON': 'COMMENT ON',
+'COMMENT ON PROVIDER': 'COMMENT ON PROVIDER',
+'COMMENT ON SHARE': 'COMMENT ON SHARE',
+'COMMENT ON RECIPIENT': 'COMMENT ON RECIPIENT',
+'COMMENT ON VOLUME': 'COMMENT ON VOLUME',
+'COMMENT ON CONNECTION': 'COMMENT ON CONNECTION',
+'CREATE BLOOMFILTER INDEX': 'CREATE BLOOMFILTER INDEX',
+'CREATE CATALOG': 'CREATE CATALOG',
+'CREATE FUNCTION': 'CREATE FUNCTION',
+'CREATE LOCATION': 'CREATE LOCATION',
+'CREATE RECIPIENT': 'CREATE RECIPIENT',
+'CREATE SCHEMA': 'CREATE SCHEMA',
+'CREATE TABLE CLONE': 'CREATE TABLE CLONE',
+'liquid clustering': 'liquid clustering',
+'CREATE SHARE': 'CREATE SHARE',
+'Iceberg': 'Iceberg',
+'disaster recovery': 'disaster recovery',
+'CREATE TABLE': 'CREATE TABLE',
+'CREATE TABLE LIKE': 'CREATE TABLE LIKE',
+'SHOW CREATE TABLE': 'SHOW CREATE TABLE',
+'REPLACE TABLE': 'REPLACE TABLE',
+'DESC': 'DESC',
+'Lakeview': 'Lakeview',
+'Network Connectivity Configs': 'Network Connectivity Configs',
+'SparkSession': 'SparkSession',
+'GitHub Actions': 'GitHub Actions',
+'Snowplow': 'Snowplow',
+'Arcion': 'Arcion',
+'Hevo': 'Hevo',
+'Hevo Data': 'Hevo Data',
+'Infoworks': 'Infoworks',
+'DataFoundry': 'DataFoundry',
+'Qlik': 'Qlik',
+'Qlik Replicate': 'Qlik Replicate',
+'Qlik Compose': 'Qlik Compose',
+'Rivery': 'Rivery',
+'Stitch': 'Stitch',
+'StreamSets': 'StreamSets',
+'Syncsort': 'Syncsort',
+'dbt': 'dbt',
+'dbt Cloud': 'dbt Cloud',
+'dbt Core': 'dbt Core',
+'Matillion': 'Matillion',
+'Prophecy': 'Prophecy',
+'Labelbox': 'Labelbox',
+'Hex': 'Hex',
+'MicroStrategy': 'MicroStrategy',
+'Mode': 'Mode',
+'Sigma': 'Sigma',
+'SQL Workbench/J': 'SQL Workbench/J',
+'ThoughtSpot': 'ThoughtSpot',
+'TIBCO Spotfire': 'TIBCO Spotfire',
+'TIBCO Spotfire Analyst': 'TIBCO Spotfire Analyst',
+'Census': 'Census',
+'Hightouch': 'Hightouch',
+'AtScale': 'AtScale',
+'Stardog': 'Stardog',
+'Alation': 'Alation',
+'Anomalo': 'Anomalo',
+'erwin Data Modeler': 'erwin Data Modeler',
+'erwin Data Modeler by Quest': 'erwin Data Modeler by Quest',
+'Lightup': 'Lightup',
+'Hunters': 'Hunters',
+'Privacera': 'Privacera',
+'CREATE VIEW': 'CREATE VIEW',
+'Microsoft Entra ID': 'Microsoft Entra ID',
+'Databricks Connect': 'Databricks Connect',
+'Windows': 'Windows',
+'RudderStack': 'RudderStack',
+'WindowSpecDefinition': 'WindowSpecDefinition',
+'2.0.61.Final-windows-x86_64': '2.0.61.Final-windows-x86_64',
+'feature table': 'feature table',
+'deletion vector': 'deletion vector',
+'Vector Search': 'Vector Search',
+'Z-ordered': 'Z-ordered',
+'Poetry': 'Poetry',
+'Generative AI': 'Generative AI',
+'large language model': 'large language model',
+'LLM': 'LLM',
+'foundation model': 'foundation model',
+'fine tuning': 'fine tuning',
+'AI Functions': 'AI Functions',
+'Transformer': 'Transformer',
+'DetrForSegmentation': 'DetrForSegmentation',
+'pyodbc': 'pyodbc',
+'TABLESAMPLE': 'TABLESAMPLE',
+'Node.js': 'Node.js',
+'Node Version Manager': 'Node Version Manager',
+'CDKTF CLI': 'CDKTF CLI',
+'Graviton': 'Graviton',
+'UDAFs': 'UDAFs',
+'globber': 'globber',
+'AI Playground': 'AI Playground',
+'Genie': 'Genie',
+'AI Functions on Databricks': 'AI Functions on Databricks',
+'Eclipse': 'Eclipse',
+'IntelliJ IDEA': 'IntelliJ IDEA',
+'IDEs': 'IDEs',
+'RocksDB': 'RocksDB',
+'Guava': 'Guava',
+'Protobuf': 'Protobuf',
+'AvroDeserializer': 'AvroDeserializer',
+'Catalyst': 'Catalyst',
+'TreeNode': 'TreeNode',
+'DBeaver': 'DBeaver',
+'DataGrip': 'DataGrip',
+'OAuth': 'OAuth',
+'Tableau Cloud': 'Tableau Cloud',
+'Tableau Server': 'Tableau Server',
+'Infrastructure-as-Code': 'Infrastructure-as-Code',
+'bamboolib': 'bamboolib',
+'Silver layer': 'Silver layer',
+'Gold layer': 'Gold layer',
+'Bronze layer': 'Bronze layer',
+'medallion architecture': 'medallion architecture',
+'vacuum': 'vacuum',
+'ALTER CONNECTION': 'ALTER CONNECTION',
+'ALTER STREAMING TABLE': 'ALTER STREAMING TABLE',
+'ALTER VOLUME': 'ALTER VOLUME',
+'CREATE CONNECTION': 'CREATE CONNECTION',
+'CREATE DATABASE': 'CREATE DATABASE',
+'CREATE MATERIALIZED VIEW': 'CREATE MATERIALIZED VIEW',
+'CREATE SERVER': 'CREATE SERVER',
+'CREATE STREAMING TABLE': 'CREATE STREAMING TABLE',
+'CREATE VOLUME': 'CREATE VOLUME',
+'DECLARE VARIABLE': 'DECLARE VARIABLE',
+'DROP BLOOMFILTER INDEX': 'DROP BLOOMFILTER INDEX',
+'DROP CATALOG': 'DROP CATALOG',
+'DROP CONNECTION': 'DROP CONNECTION',
+'DROP DATABASE': 'DROP DATABASE',
+'DROP CREDENTIAL': 'DROP CREDENTIAL',
+'DROP FUNCTION': 'DROP FUNCTION',
+'DROP LOCATION': 'DROP LOCATION',
+'DROP PROVIDER': 'DROP PROVIDER',
+'DROP RECIPIENT': 'DROP RECIPIENT',
+'DROP SCHEMA': 'DROP SCHEMA',
+'DROP SHARE': 'DROP SHARE',
+'DROP TABLE': 'DROP TABLE',
+'DROP VARIABLE': 'DROP VARIABLE',
+'DROP VIEW': 'DROP VIEW',
+'DROP VOLUME': 'DROP VOLUME',
+'MSCK REPAIR TABLE': 'MSCK REPAIR TABLE',
+'REFRESH FOREIGN': 'REFRESH FOREIGN',
+'REFRESH': 'REFRESH',
+'MATERIALIZED VIEW': 'MATERIALIZED VIEW',
+'STREAMING TABLE': 'STREAMING TABLE',
+'SYNC': 'SYNC',
+'TRUNCATE TABLE': 'TRUNCATE TABLE',
+'UNDROP TABLE': 'UNDROP TABLE',
+'DELETE FROM': 'DELETE FROM',
+'INSERT INTO': 'INSERT INTO',
+'INSERT OVERWRITE DIRECTORY': 'INSERT OVERWRITE DIRECTORY',
+'LOAD DATA': 'LOAD DATA',
+'MERGE INTO': 'MERGE INTO',
+'UPDATE': 'UPDATE',
+'CACHE SELECT': 'CACHE SELECT',
+'CONVERT TO DELTA': 'CONVERT TO DELTA',
+'DESCRIBE HISTORY': 'DESCRIBE HISTORY',
+'FSCK REPAIR TABLE': 'FSCK REPAIR TABLE',
+'GENERATE': 'GENERATE',
+'OPTIMIZE': 'OPTIMIZE',
+'REORG TABLE': 'REORG TABLE',
+'RESTORE': 'RESTORE',
+'ANALYZE TABLE': 'ANALYZE TABLE',
+'CACHE TABLE': 'CACHE TABLE',
+'CLEAR CACHE': 'CLEAR CACHE',
+'REFRESH CACHE': 'REFRESH CACHE',
+'REFRESH FUNCTION': 'REFRESH FUNCTION',
+'REFRESH TABLE': 'REFRESH TABLE',
+'UNCACHE TABLE': 'UNCACHE TABLE',
+'DESCRIBE CATALOG': 'DESCRIBE CATALOG',
+'DESCRIBE CONNECTION': 'DESCRIBE CONNECTION',
+'DESCRIBE CREDENTIAL': 'DESCRIBE CREDENTIAL',
+'DESCRIBE DATABASE': 'DESCRIBE DATABASE',
+'DESCRIBE FUNCTION': 'DESCRIBE FUNCTION',
+'DESCRIBE LOCATION': 'DESCRIBE LOCATION',
+'DESCRIBE PROVIDER': 'DESCRIBE PROVIDER',
+'DESCRIBE QUERY': 'DESCRIBE QUERY',
+'DESCRIBE RECIPIENT': 'DESCRIBE RECIPIENT',
+'DESCRIBE SCHEMA': 'DESCRIBE SCHEMA',
+'DESCRIBE SHARE': 'DESCRIBE SHARE',
+'DESCRIBE TABLE': 'DESCRIBE TABLE',
+'DESCRIBE VOLUME': 'DESCRIBE VOLUME',
+'LIST': 'LIST',
+'SHOW ALL IN SHARE': 'SHOW ALL IN SHARE',
+'SHOW CATALOGS': 'SHOW CATALOGS',
+'SHOW COLUMNS': 'SHOW COLUMNS',
+'SHOW CONNECTIONS': 'SHOW CONNECTIONS',
+'SHOW CREDENTIALS': 'SHOW CREDENTIALS',
+'SHOW DATABASES': 'SHOW DATABASES',
+'SHOW FUNCTIONS': 'SHOW FUNCTIONS',
+'SHOW GROUPS': 'SHOW GROUPS',
+'SHOW LOCATIONS': 'SHOW LOCATIONS',
+'SHOW PARTITIONS': 'SHOW PARTITIONS',
+'SHOW PROVIDERS': 'SHOW PROVIDERS',
+'SHOW RECIPIENTS': 'SHOW RECIPIENTS',
+'SHOW SCHEMAS': 'SHOW SCHEMAS',
+'SHOW SHARES': 'SHOW SHARES',
+'SHOW SHARES IN PROVIDER': 'SHOW SHARES IN PROVIDER',
+'SHOW TABLE': 'SHOW TABLE',
+'SHOW TABLES': 'SHOW TABLES',
+'SHOW TABLES DROPPED': 'SHOW TABLES DROPPED',
+'SHOW TBLPROPERTIES': 'SHOW TBLPROPERTIES',
+'SHOW USERS': 'SHOW USERS',
+'SHOW VIEWS': 'SHOW VIEWS',
+'SHOW VOLUMES': 'SHOW VOLUMES',
+'RESET': 'RESET',
+'SET': 'SET',
+'SET TIMEZONE': 'SET TIMEZONE',
+'SET VARIABLE': 'SET VARIABLE',
+'USE CATALOG': 'USE CATALOG',
+'USE DATABASE': 'USE DATABASE',
+'USE SCHEMA': 'USE SCHEMA',
+'ADD ARCHIVE': 'ADD ARCHIVE',
+'ADD FILE': 'ADD FILE',
+'ADD JAR': 'ADD JAR',
+'LIST ARCHIVE': 'LIST ARCHIVE',
+'LIST FILE': 'LIST FILE',
+'LIST JAR': 'LIST JAR',
+'ALTER GROUP': 'ALTER GROUP',
+'CREATE GROUP': 'CREATE GROUP',
+'DENY': 'DENY',
+'DROP GROUP': 'DROP GROUP',
+'GRANT': 'GRANT',
+'GRANT SHARE': 'GRANT SHARE',
+'REPAIR PRIVILEGES': 'REPAIR PRIVILEGES',
+'REVOKE': 'REVOKE',
+'REVOKE SHARE': 'REVOKE SHARE',
+'SHOW GRANTS': 'SHOW GRANTS',
+'SHOW GRANTS ON SHARE': 'SHOW GRANTS ON SHARE',
+'SHOW GRANTS TO RECIPIENT': 'SHOW GRANTS TO RECIPIENT',
+'spark-tensorflow-connector': 'spark-tensorflow-connector',
+'GraphFrames': 'GraphFrames',
+'sparkdl.xgboost': 'sparkdl.xgboost',
+'sparkdl': 'sparkdl',
+'predictive optimization': 'predictive optimization',
+'EDA': 'EDA',
+'GitLab': 'GitLab',
+'ai_query': 'ai_query',
+'Feature Engineering in Unity Catalog': 'Feature Engineering in Unity Catalog',
+'system table': 'system table',
+'Dataiku': 'Dataiku',
+'Mosaic AI': 'Mosaic AI',
+'Databricks Mosaic AI': 'Databricks Mosaic AI',
+'Mosaic AI Model Serving': 'Mosaic AI Model Serving',
+'Mosaic AI Vector Search': 'Mosaic AI Vector Search',
+'Mosaic AI Playground': 'Mosaic AI Playground',
+'Mosaic AI Foundational Models API': 'Mosaic AI Foundational Models API',
+'Mosaic AI Pretraining': 'Mosaic AI Pretraining',
+'Mosaic AI AutoML': 'Mosaic AI AutoML',
+'Mosaic AI Functions': 'Mosaic AI Functions',
+'DatabricksIQ': 'DatabricksIQ',
+'CAN VIEW': 'CAN VIEW',
+'NO PERMISSIONS': 'NO PERMISSIONS',
+'CAN RUN': 'CAN RUN',
+'CAN EDIT': 'CAN EDIT',
+'CAN MANAGE': 'CAN MANAGE',
+'CAN MANAGE RUN': 'CAN MANAGE RUN',
+'IS OWNER': 'IS OWNER',
+'CAN QUERY': 'CAN QUERY',
+'CAN VIEW METADATA': 'CAN VIEW METADATA',
+'CAN EDIT METADATA': 'CAN EDIT METADATA',
+'CAN READ': 'CAN READ',
+'CAN MANAGE STAGING VERSIONS': 'CAN MANAGE STAGING VERSIONS',
+'CAN MANAGE PRODUCTION VERSIONS': 'CAN MANAGE PRODUCTION VERSIONS',
+'ai_analyze_sentiment': 'ai_analyze_sentiment',
+'ai_classify': 'ai_classify',
+'ai_extract': 'ai_extract',
+'ai_fix_grammar': 'ai_fix_grammar',
+'ai_gen': 'ai_gen',
+'ai_mask': 'ai_mask',
+'ai_similarity': 'ai_similarity',
+'ai_summarize': 'ai_summarize',
+'ai_translate': 'ai_translate',
+'MPT': 'MPT',
+'Llama': 'Llama',
+'Mixtral': 'Mixtral',
+'Mistral': 'Mistral',
+'Feature Serving': 'Feature Serving',
+'Amazon Bedrock': 'Amazon Bedrock',
+'Anthropic': 'Anthropic',
+'Cohere': 'Cohere',
+'AI21 Labs': 'AI21 Labs',
+'Vertex AI': 'Vertex AI',
+'Databricks-to-Databricks': 'Databricks-to-Databricks',
+'web terminal': 'web terminal',
+'Query Watchdog': 'Query Watchdog',
+'ipynb': 'ipynb',
+'VPC Service Controls': 'VPC Service Controls',
+'Service Perimeter': 'Service Perimeter',
+'emergency access': 'emergency access',
+'FedRAMP Moderate': 'FedRAMP Moderate',
+'docstring-to-markdown': 'docstring-to-markdown',
+'rmarkdown': 'rmarkdown',
+'read-evaluate-print loop': 'read-evaluate-print loop',
+'Databricks Assistant': 'Databricks Assistant',
+'Genie space': 'Genie space',
+'pay-per-token': 'pay-per-token',
+'Hyperparameter tuning': 'Hyperparameter tuning',
+'LakeFlow': 'LakeFlow',
+'LakeFlow Connect': 'LakeFlow Connect',
+'LakeFlow Pipelines': 'LakeFlow Pipelines',
+'LakeFlow Job': 'LakeFlow Job',
+'decision tree': 'decision tree',
+'Databricks Autologging': 'Databricks Autologging',
+'AI/BI': 'AI/BI',
+'shallow clone': 'shallow clone',
+'deep clone': 'deep clone',
+'UniForm': 'UniForm',
+'managed table': 'managed table',
+'unmanaged table': 'unmanaged table',
+'external table': 'external table',
+'foreign table': 'foreign table',
+'Databricks Geos': 'Databricks Geos',
+'Geo': 'Geo',
+'Geos': 'Geos',
+'Databricks Geo': 'Databricks Geo',
+'capsule8-alerts-dataplane': 'capsule8-alerts-dataplane',
+'Clean Room': 'Clean Room',
+'Artifact': 'Artifact',
+'AI/BI dashboard': 'AI/BI dashboard',
+'Genie spaces': 'Genie spaces',
+'Mosaic AI Gateway': 'Mosaic AI Gateway',
+'Glue': 'Glue',
+'Budget policy': 'Budget policy',
+'materialized view': 'materialized view',
+'streaming table': 'streaming table',
+'SuperAnnotate': 'SuperAnnotate',
+'Groq': 'Groq',
+'LiteLLM': 'LiteLLM',
+'CrewAI': 'CrewAI',
+'DSPy': 'DSPy',
+'MLflow Tracing': 'MLflow Tracing',
+'SME': 'SME',
+'Serverless budget policy': 'Serverless budget policy',
+
   // Databricks プラットフォーム・製品
   'Databricks': 'Databricks',
   'BI': 'BI',
@@ -630,90 +1261,6 @@ function translateSpecificPageJaToEn() {
 }
 
 /**
- * Databricks APIを使用してシェイプのテキストを校正する
- * @param {Shape} shape 校正対象のシェイプ
- */
-function databricksProofreadShape(shape) {
-  for (let paragraphText of shape.getText().getParagraphs()) {
-    paragraphText = paragraphText.getRange();
-    const originalText = paragraphText.asString();
-    
-    if (!originalText || originalText.trim() === '') {
-      continue;
-    }
-    
-    const proofreadText = proofreadWithDatabricks(originalText);
-    paragraphText.setText(proofreadText);
-  }
-}
-
-/**
- * Databricks APIを使用してグループ内のシェイプのテキストを校正する
- * @param {Group} group 校正対象のグループ
- */
-function databricksProofreadGroup(group) {
-  const childElements = group.getChildren();
-
-  for (let childElement of childElements) {
-    if (childElement.getPageElementType() === SlidesApp.PageElementType.SHAPE) {
-      databricksProofreadShape(childElement.asShape());
-    } else if (childElement.getPageElementType() === SlidesApp.PageElementType.GROUP) {
-      databricksProofreadGroup(childElement.asGroup());
-    }
-  }
-}
-
-/**
- * Databricks APIを使用してスライド内のテーブルを校正する
- * @param {Slide} slide 校正対象のスライド
- */
-function databricksProofreadTableInSlide(slide) {
-  const tables = slide.getTables();
-
-  for (let table of tables) {
-    const numRows = table.getNumRows();
-    const numColumns = table.getNumColumns();
-
-    for (let row = 0; row < numRows; row++) {
-      for (let col = 0; col < numColumns; col++) {
-        try {
-          const cell = table.getCell(row, col);
-          const originalText = cell.getText().asString();
-          if (originalText === '' || originalText.trim() === '') {
-            continue;
-          }
-
-          const proofreadText = proofreadWithDatabricks(originalText);
-          cell.getText().setText(proofreadText);
-        } catch (error) {
-          console.log(`セル (${row}, ${col}) をスキップしました: ${error.message}`);
-          continue;
-        }
-      }
-    }
-  }
-}
-
-/**
- * Databricks APIを使用してスピーカーノートを校正する
- * @param {Slide} slide 校正対象のスライド
- */
-function databricksProofreadSpeakerNotes(slide) {
-  const notesPageTexts = slide.getNotesPage().getSpeakerNotesShape().getText().getParagraphs();
-  for(let paragraphText of notesPageTexts) {
-    paragraphText = paragraphText.getRange();
-    const originalText = paragraphText.asString();
-    
-    if (!originalText || originalText.trim() === '') {
-      continue;
-    }
-    
-    const proofreadText = proofreadWithDatabricks(originalText);
-    paragraphText.setText(proofreadText);
-  }
-}
-
-/**
  * Databricks API設定を行う
  */
 function setupDatabricksAPI() {
@@ -779,6 +1326,7 @@ function protectAndTranslate(text, translationFunction) {
   // 除外用語をプレースホルダーに置換
   Object.keys(allExclusions).forEach(term => {
     const escapedTerm = term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
     const regex = new RegExp(`\\b${escapedTerm}\\b`, 'gi');
     
     protectedText = protectedText.replace(regex, (match) => {
@@ -803,6 +1351,7 @@ function protectAndTranslate(text, translationFunction) {
 
   return translatedText;
 }
+
 /**
  * 保護機能付きGoogle翻訳
  * @param {string} text 翻訳する元のテキスト
@@ -927,7 +1476,7 @@ function advancedJapaneseProofread(text) {
 }
 
 /**
- * スライドのテキストを翻訳する
+ * スライドのテキストを翻訳する（修正版：リスト書式を保持）
  * @param {Slide} slide 翻訳対象のスライド
  * @param {string} src 元の言語コード
  * @param {string} tgt 翻訳後の言語コード
@@ -950,26 +1499,33 @@ function translateSlide(slide, src, tgt) {
 }
 
 /**
- * シェイプのテキストを翻訳する
+ * シェイプのテキストを翻訳する（修正版：リスト書式を保持）
  * @param {Shape} shape 翻訳対象のシェイプ
  * @param {Slide} slide シェイプが含まれるスライド
  * @param {string} src 元の言語コード
  * @param {string} tgt 翻訳後の言語コード
  */
 function translateShape(shape, slide, src, tgt) {
-  /*スタイル維持のために Paragraph ごとに翻訳する*/
-  for (let paragraphText of shape.getText().getParagraphs()) {
-    paragraphText = paragraphText.getRange();
-    const originalText = paragraphText.asString();
-    
-    // 空文字の場合はスキップ
-    if (!originalText || originalText.trim() === '') {
-      continue;
+  const textRange = shape.getText();
+  const fullText = textRange.asString();
+  
+  if (fullText.trim() === '') {
+    return;
+  }
+  
+  // 全体のテキストを一度に翻訳
+  const translatedFullText = translateWithGoogle(fullText, src, tgt);
+  
+  // テキスト全体を置き換え
+  textRange.setText(translatedFullText);
+  
+  // 翻訳後の各段落に対してフォントサイズ調整
+  const paragraphs = textRange.getParagraphs();
+  for (let paragraph of paragraphs) {
+    const paragraphRange = paragraph.getRange();
+    if (paragraphRange.asString().trim() !== '') {
+      reduceTextSize(paragraphRange);
     }
-    
-    const translatedText = translateWithGoogle(originalText, src, tgt);
-    paragraphText.setText(translatedText);
-    reduceTextSize(paragraphText);
   }
 }
 
@@ -978,17 +1534,37 @@ function translateShape(shape, slide, src, tgt) {
  * @param {Shape} shape 校正対象のシェイプ
  */
 function proofreadShape(shape) {
-  for (let paragraphText of shape.getText().getParagraphs()) {
-    paragraphText = paragraphText.getRange();
-    const originalText = paragraphText.asString();
-    
-    if (!originalText || originalText.trim() === '') {
-      continue;
-    }
-    
-    const proofreadText = advancedJapaneseProofread(originalText);
-    paragraphText.setText(proofreadText);
+  const textRange = shape.getText();
+  const fullText = textRange.asString();
+  
+  if (fullText.trim() === '') {
+    return;
   }
+  
+  // 全体のテキストを一度に校正
+  const proofreadFullText = advancedJapaneseProofread(fullText);
+  
+  // テキスト全体を置き換え
+  textRange.setText(proofreadFullText);
+}
+
+/**
+ * Databricks APIを使用してシェイプのテキストを校正する（修正版：リスト書式を保持）
+ * @param {Shape} shape 校正対象のシェイプ
+ */
+function databricksProofreadShape(shape) {
+  const textRange = shape.getText();
+  const fullText = textRange.asString();
+  
+  if (fullText.trim() === '') {
+    return;
+  }
+  
+  // 全体のテキストを一度に校正
+  const proofreadFullText = proofreadWithDatabricks(fullText);
+  
+  // テキスト全体を置き換え
+  textRange.setText(proofreadFullText);
 }
 
 /**
@@ -1022,6 +1598,22 @@ function proofreadGroup(group) {
       proofreadShape(childElement.asShape());
     } else if (childElement.getPageElementType() === SlidesApp.PageElementType.GROUP) {
       proofreadGroup(childElement.asGroup());
+    }
+  }
+}
+
+/**
+ * Databricks APIを使用してグループ内のシェイプのテキストを校正する
+ * @param {Group} group 校正対象のグループ
+ */
+function databricksProofreadGroup(group) {
+  const childElements = group.getChildren();
+
+  for (let childElement of childElements) {
+    if (childElement.getPageElementType() === SlidesApp.PageElementType.SHAPE) {
+      databricksProofreadShape(childElement.asShape());
+    } else if (childElement.getPageElementType() === SlidesApp.PageElementType.GROUP) {
+      databricksProofreadGroup(childElement.asGroup());
     }
   }
 }
@@ -1082,6 +1674,37 @@ function proofreadTableInSlide(slide) {
           }
 
           const proofreadText = advancedJapaneseProofread(originalText);
+          cell.getText().setText(proofreadText);
+        } catch (error) {
+          console.log(`セル (${row}, ${col}) をスキップしました: ${error.message}`);
+          continue;
+        }
+      }
+    }
+  }
+}
+
+/**
+ * Databricks APIを使用してスライド内のテーブルを校正する
+ * @param {Slide} slide 校正対象のスライド
+ */
+function databricksProofreadTableInSlide(slide) {
+  const tables = slide.getTables();
+
+  for (let table of tables) {
+    const numRows = table.getNumRows();
+    const numColumns = table.getNumColumns();
+
+    for (let row = 0; row < numRows; row++) {
+      for (let col = 0; col < numColumns; col++) {
+        try {
+          const cell = table.getCell(row, col);
+          const originalText = cell.getText().asString();
+          if (originalText === '' || originalText.trim() === '') {
+            continue;
+          }
+
+          const proofreadText = proofreadWithDatabricks(originalText);
           cell.getText().setText(proofreadText);
         } catch (error) {
           console.log(`セル (${row}, ${col}) をスキップしました: ${error.message}`);
@@ -1181,43 +1804,65 @@ function proofreadSpecificPage() {
 }
 
 /**
- * スピーカーノートを翻訳する
+ * スピーカーノートを翻訳する（修正版：書式を保持）
  * @param {Slide} slide テキストが含まれるスライド
  * @param {string} src 元の言語コード
  * @param {string} tgt 翻訳後の言語コード
  */
 function translateSpeakerNotes(slide, src, tgt) {
-  const notesPageTexts = slide.getNotesPage().getSpeakerNotesShape().getText().getParagraphs();
-  for(let paragraphText of notesPageTexts) {
-    paragraphText = paragraphText.getRange();
-    const originalText = paragraphText.asString();
-    
-    if (!originalText || originalText.trim() === '') {
-      continue;
-    }
-    
-    const translatedText = translateWithGoogle(originalText, src, tgt);
-    paragraphText.setText(translatedText);
+  const speakerNotesShape = slide.getNotesPage().getSpeakerNotesShape();
+  const textRange = speakerNotesShape.getText();
+  const fullText = textRange.asString();
+  
+  if (fullText.trim() === '') {
+    return;
   }
+  
+  // 全体のテキストを一度に翻訳
+  const translatedFullText = translateWithGoogle(fullText, src, tgt);
+  
+  // テキスト全体を置き換え
+  textRange.setText(translatedFullText);
 }
 
 /**
- * スピーカーノートを校正する
+ * スピーカーノートを校正する（修正版：書式を保持）
  * @param {Slide} slide 校正対象のスライド
  */
 function proofreadSpeakerNotes(slide) {
-  const notesPageTexts = slide.getNotesPage().getSpeakerNotesShape().getText().getParagraphs();
-  for(let paragraphText of notesPageTexts) {
-    paragraphText = paragraphText.getRange();
-    const originalText = paragraphText.asString();
-    
-    if (!originalText || originalText.trim() === '') {
-      continue;
-    }
-    
-    const proofreadText = advancedJapaneseProofread(originalText);
-    paragraphText.setText(proofreadText);
+  const speakerNotesShape = slide.getNotesPage().getSpeakerNotesShape();
+  const textRange = speakerNotesShape.getText();
+  const fullText = textRange.asString();
+  
+  if (fullText.trim() === '') {
+    return;
   }
+  
+  // 全体のテキストを一度に校正
+  const proofreadFullText = advancedJapaneseProofread(fullText);
+  
+  // テキスト全体を置き換え
+  textRange.setText(proofreadFullText);
+}
+
+/**
+ * Databricks APIを使用してスピーカーノートを校正する（修正版：書式を保持）
+ * @param {Slide} slide 校正対象のスライド
+ */
+function databricksProofreadSpeakerNotes(slide) {
+  const speakerNotesShape = slide.getNotesPage().getSpeakerNotesShape();
+  const textRange = speakerNotesShape.getText();
+  const fullText = textRange.asString();
+  
+  if (fullText.trim() === '') {
+    return;
+  }
+  
+  // 全体のテキストを一度に校正
+  const proofreadFullText = proofreadWithDatabricks(fullText);
+  
+  // テキスト全体を置き換え
+  textRange.setText(proofreadFullText);
 }
 
 /**
@@ -1258,7 +1903,10 @@ function reduceTextSize(text) {
     }
   }
 }
-/**使用して全てのスライドを校正する*/
+
+/**
+ * Databricks APIを使用して全てのスライドを校正する
+ */
 function databricksProofreadAllSlides() {
   if (!DATABRICKS_TOKEN || !DATABRICKS_WORKSPACE) {
     SlidesApp.getUi().alert('Databricks API設定が不完全です。「Databricks API設定」から設定してください。');
