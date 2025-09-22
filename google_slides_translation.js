@@ -127,6 +127,21 @@ const DATABRICKS_MODEL_ENDPOINT = 'databricks-meta-llama-3-1-70b-instruct'; // �
  * 随時追加・編集可能
  */
 const TRANSLATION_EXCLUSIONS = {
+// 追加
+'permission':'権限',
+'Authentication':'Authentications',
+'authorization':'認可',
+'Tick Data':'Tick Data',
+'Refined':'Refined',
+'Raw': 'Raw',
+'Aggregated': 'Aggregated',
+'Query and Process': 'Query and Process',
+'Transform': 'Transform',
+'Ingest': 'Ingest',
+'Delta Lake': 'Delta Lake',
+'Serve': 'Serve',
+'Platinum layer': 'Platinum layer',
+'Analysis/Output': 'Analysis/Output',
 // Databricks 公式
 '4X-Large': '4X-Large',
 'ACL': 'ACL',
@@ -184,6 +199,7 @@ const TRANSLATION_EXCLUSIONS = {
 'Community Edition': 'Community Edition',
 'Couchbase': 'Couchbase',
 'Data Explorer': 'Data Explorer',
+'data source': 'data source',
 'CSV': 'CSV',
 'Databricks Community Edition': 'Databricks Community Edition',
 'Databricks Delta': 'Databricks Delta',
