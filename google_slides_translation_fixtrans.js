@@ -28,10 +28,11 @@ function saveCustomExclusions(exclusions) {
  * デフォルト固定翻訳辞書
  */
 const DEFAULT_FIXED_TRANSLATIONS = {
-  'permission': '権限',
-  'Authentication': '認証',
-  'authorization': '認可'
-};
+//'Permission': '権限',
+//'Authentication': '認証',
+//'authorization': '認可',
+//'Authorization': '認可'
+ };
 
 /**
  * 固定翻訳辞書を取得する
@@ -314,9 +315,9 @@ const DATABRICKS_MODEL_ENDPOINT = 'databricks-meta-llama-3-1-70b-instruct'; // �
  */
 const TRANSLATION_EXCLUSIONS = {
  // 追加
-'permission':'権限',
-'Authentication':'Authentications',
-'authorization':'認可',
+'permission':'permission',
+'Authentication':'authentications',
+'authorization':'authorization',
 'Tick Data':'Tick Data',
 'Refined':'Refined',
 'Raw': 'Raw',
@@ -1611,8 +1612,8 @@ function translateWithGoogle(text, src, tgt) {
     return text;
   }
 
-  // 1. まず固定翻訳を適用（翻訳前）
-  let processedText = applyFixedTranslations(text, tgt);
+// 1. まず固定翻訳を適用（翻訳前）
+ let processedText = applyFixedTranslations(text, tgt);
 
   // 2. 除外用語を保護して翻訳
   const translatedText = protectAndTranslate(processedText, (protectedText) => {
@@ -1621,12 +1622,12 @@ function translateWithGoogle(text, src, tgt) {
   });
 
   // 3. 翻訳後にも固定翻訳を適用（翻訳で変化した可能性があるため）
-  let finalResult = applyFixedTranslations(translatedText, tgt);
+ let finalResult = applyFixedTranslations(translatedText, tgt);
 
-  // 4. 日本語への翻訳の場合、基本的な校正を適用
-  if (tgt === 'ja') {
-    finalResult = basicJapaneseProofread(finalResult);
-  }
+// 4. 日本語への翻訳の場合、基本的な校正を適用
+//  if (tgt === 'ja') {
+//    finalResult = basicJapaneseProofread(finalResult);
+//  }
   
   // API制限回避のための短いスリープ（速度向上のため50msに短縮）
   Utilities.sleep(50);
