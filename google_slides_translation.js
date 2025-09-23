@@ -128,9 +128,9 @@ const DATABRICKS_MODEL_ENDPOINT = 'databricks-meta-llama-3-1-70b-instruct'; // �
  */
 const TRANSLATION_EXCLUSIONS = {
 // 追加
-'permission':'権限',
-'Authentication':'Authentications',
-'authorization':'認可',
+'permission':'authorization',
+'Authentication':'Authentication',
+'authorization':'authorization',
 'Tick Data':'Tick Data',
 'Refined':'Refined',
 'Raw': 'Raw',
