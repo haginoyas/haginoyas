@@ -552,33 +552,6 @@ function processTextWithLookaheadListPreservation(text, processingFunction) {
   return result;
 }
 
-/**
- * デバッグ用：shouldSkipProcessing の詳細確認
- */
-function debugShouldSkipProcessing(content) {
-  console.log('=== shouldSkipProcessing デバッグ ===');
-  console.log('入力コンテンツ: "' + content + '"');
-  
-  const skipPatterns = [
-    { name: 'VaR OUTPUT完全一致', pattern: /^VaR\s+OUTPUT$/i },
-    { name: 'VaR OUTPUT部分一致', pattern: /VaR\s+OUTPUT/i },
-    { name: '連続大文字単語', pattern: /^[A-Z]{2,}\s+[A-Z]{2,}$/ },
-    { name: '略語組み合わせ', pattern: /^[A-Z]+\s+[A-Z]+$/ },
-    { name: '数値', pattern: /^\d+\.\d+$/ },
-    { name: 'バージョン番号', pattern: /^Version\s+\d+\.\d+$/i }
-  ];
-  
-  let matched = false;
-  for (let i = 0; i < skipPatterns.length; i++) {
-    const item = skipPatterns[i];
-    const isMatch = item.pattern.test(content.trim());
-    console.log(item.name + ': ' + (isMatch ? 'マッチ ✅' : 'マッチしない'));
-    if (isMatch) matched = true;
-  }
-  
-  console.log('最終判定: ' + (matched ? 'スキップ' : '処理'));
-  return matched;
-}
 
 // ---------
 
@@ -1799,7 +1772,7 @@ const TRANSLATION_EXCLUSIONS = {
  */
 function onOpen() {
   SlidesApp.getUi()
-    .createMenu('翻訳機能（書式保持・置換版）')
+    .createMenu('翻訳機能')
     .addItem('[全スライド] Google 翻訳（英語→日本語）', 'translateAllSlidesEnToJa')
     .addItem('[特定ページ] Google 翻訳（英語→日本語）', 'translateSpecificPageEnToJa')
     .addItem('[全スライド] Google 翻訳（英語→日本語・校正なし）', 'translateAllSlidesEnToJaNoProofread')
@@ -1814,7 +1787,7 @@ function onOpen() {
     .addItem('[全スライド] Databricks AI校正', 'databricksProofreadAllSlides')
     .addItem('[特定ページ] Databricks AI校正', 'databricksProofreadSpecificPage')
     .addSeparator()
-    .addItem('翻訳除外辞書を管理', 'manageTranslationExclusions')
+    .addItem('翻訳除外追加 Once', 'manageTranslationExclusions')
     .addItem('Databricks API設定', 'setupDatabricksAPI')
     .addToUi();
 }
