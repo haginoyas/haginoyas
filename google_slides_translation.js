@@ -1,3 +1,4 @@
+
 /**
  * 新しいリスト項目判定関数（完全書き直し）
  * @param {string} line 1行のテキスト
@@ -330,7 +331,7 @@ function testNumberedListCase() {
 /**
  * リスト対応版：保護機能付きGoogle翻訳（新版）
  */
-function translateWithGoogleListAwareNew(text, src, tgt) {
+function translateWithGoogleListAwareNew(text, src, tgt, enableProofread = true) {
   if (!text || text.trim() === '' || text.match(/^[\n\r\s•\-\*\d\.\)\(\s]*$/)) {
     return text;
   }
@@ -343,7 +344,9 @@ function translateWithGoogleListAwareNew(text, src, tgt) {
   });
 
   let finalResult = translatedText;
-  if (tgt === 'ja') {
+  
+  // 校正を有効にする場合のみ実行
+  if (tgt === 'ja' && enableProofread) {
     finalResult = basicJapaneseProofread(translatedText);
   }
   
@@ -354,7 +357,7 @@ function translateWithGoogleListAwareNew(text, src, tgt) {
 /**
  * 新版：書式保持版シェイプ翻訳
  */
-function translateShapeWithListAwareFormatPreservationNew(shape, slide, src, tgt) {
+function translateShapeWithListAwareFormatPreservationNew(shape, slide, src, tgt, enableProofread = true) {
   const textRange = shape.getText();
   const fullText = textRange.asString();
   
@@ -367,7 +370,7 @@ function translateShapeWithListAwareFormatPreservationNew(shape, slide, src, tgt
     if (listInfo.isListText) {
       console.log('リスト構造を検出: ' + listInfo.listType + ', ' + listInfo.totalItems + '項目');
       
-      const translatedText = translateWithGoogleListAwareNew(fullText, src, tgt);
+      const translatedText = translateWithGoogleListAwareNew(fullText, src, tgt, enableProofread);
       
       const originalLines = fullText.split('\n');
       const translatedLines = translatedText.split('\n');
@@ -401,7 +404,7 @@ function translateShapeWithListAwareFormatPreservationNew(shape, slide, src, tgt
         const paragraphFormat = collectParagraphFormat(paragraph);
         const characterFormats = collectCharacterFormats(paragraphRange);
         
-        const translatedText = translateWithGoogleListAwareNew(originalText, src, tgt);
+        const translatedText = translateWithGoogleListAwareNew(originalText, src, tgt, enableProofread);
         
         paragraphRange.setText(translatedText);
         
@@ -412,16 +415,15 @@ function translateShapeWithListAwareFormatPreservationNew(shape, slide, src, tgt
     
   } catch (error) {
     console.log('新版シェイプ翻訳エラー:', error);
-    const translatedText = translateWithGoogleListAwareNew(fullText, src, tgt);
+    const translatedText = translateWithGoogleListAwareNew(fullText, src, tgt, enableProofread);
     textRange.setText(translatedText);
   }
 }
-
 /**
  * 元の関数名との互換性のためのエイリアス
  */
-function translateShapeWithListAwareFormatPreservation(shape, slide, src, tgt) {
-  return translateShapeWithListAwareFormatPreservationNew(shape, slide, src, tgt);
+function translateShapeWithListAwareFormatPreservation(shape, slide, src, tgt, enableProofread = true) {
+  return translateShapeWithListAwareFormatPreservationNew(shape, slide, src, tgt, enableProofread);
 }
 
 /**
@@ -2105,6 +2107,9 @@ function onOpen() {
     .createMenu('翻訳機能（書式保持・置換版）')
     .addItem('[全スライド] Google 翻訳（英語→日本語）', 'translateAllSlidesEnToJa')
     .addItem('[特定ページ] Google 翻訳（英語→日本語）', 'translateSpecificPageEnToJa')
+    .addItem('[全スライド] Google 翻訳（英語→日本語・校正なし）', 'translateAllSlidesEnToJaNoProofread')
+    .addItem('[特定ページ] Google 翻訳（英語→日本語・校正なし）', 'translateSpecificPageEnToJaNoProofread')
+    .addSeparator()
     .addItem('[全スライド] Google 翻訳（日本語→英語）', 'translateAllSlidesJaToEn')
     .addItem('[特定ページ] Google 翻訳（日本語→英語）', 'translateSpecificPageJaToEn')
     .addSeparator()
@@ -2122,11 +2127,12 @@ function onOpen() {
 // 翻訳関数のエントリーポイント
 function translateAllSlidesEnToJa() { translateAllSlides('en', 'ja'); }
 function translateSpecificPageEnToJa() { translateSpecificPage('en', 'ja'); }
+function translateAllSlidesEnToJaNoProofread() { translateAllSlides('en', 'ja', false); }
+function translateSpecificPageEnToJaNoProofread() { translateSpecificPage('en', 'ja', false); }
 function translateAllSlidesJaToEn() { translateAllSlides('ja', 'en'); }
 function translateSpecificPageJaToEn() { translateSpecificPage('ja', 'en'); }
 function proofreadAllSlidesJapanese() { proofreadAllSlides(); }
 function proofreadSpecificPageJapanese() { proofreadSpecificPage(); }
-
 /**
  * Databricks API設定を行う
  */
@@ -2732,16 +2738,16 @@ function databricksProofreadShapeWithFormatPreservation(shape) {
 /**
  * スライドのテキストを翻訳する（書式保持版）
  */
-function translateSlide(slide, src, tgt) {
-  translateSpeakerNotesWithFormatPreservation(slide, src, tgt);
+function translateSlide(slide, src, tgt, enableProofread = true) {
+  translateSpeakerNotesWithFormatPreservation(slide, src, tgt, enableProofread);
 
   const pageElements = slide.getPageElements();
 
   for (let pageElement of pageElements) {
     if (pageElement.getPageElementType() === SlidesApp.PageElementType.SHAPE) {
-      translateShapeWithListAwareFormatPreservation(pageElement.asShape(), slide, src, tgt);
+      translateShapeWithListAwareFormatPreservation(pageElement.asShape(), slide, src, tgt, enableProofread);
     } else if (pageElement.getPageElementType() === SlidesApp.PageElementType.GROUP) {
-      translateGroupWithFormatPreservation(pageElement.asGroup(), slide, src, tgt);
+      translateGroupWithFormatPreservation(pageElement.asGroup(), slide, src, tgt, enableProofread);
     }
   }
   
@@ -2751,14 +2757,14 @@ function translateSlide(slide, src, tgt) {
 /**
  * グループ内のシェイプのテキストを翻訳する（書式保持版）
  */
-function translateGroupWithFormatPreservation(group, slide, src, tgt) {
+function translateGroupWithFormatPreservation(group, slide, src, tgt, enableProofread = true) {
   const childElements = group.getChildren();
 
   for (let childElement of childElements) {
     if (childElement.getPageElementType() === SlidesApp.PageElementType.SHAPE) {
-      translateShapeWithListAwareFormatPreservation(childElement.asShape(), slide, src, tgt);
+      translateShapeWithListAwareFormatPreservation(childElement.asShape(), slide, src, tgt, enableProofread);
     } else if (childElement.getPageElementType() === SlidesApp.PageElementType.GROUP) {
-      translateGroupWithFormatPreservation(childElement.asGroup(), slide, src, tgt);
+      translateGroupWithFormatPreservation(childElement.asGroup(), slide, src, tgt, enableProofread);
     }
   }
 }
@@ -2792,11 +2798,10 @@ function databricksProofreadGroupWithFormatPreservation(group) {
     }
   }
 }
-
 /**
  * スライド内のテーブルを翻訳する（書式保持版）
  */
-function translateTableInSlideWithFormatPreservation(slide, src, tgt) {
+function translateTableInSlideWithFormatPreservation(slide, src, tgt, enableProofread = true) {
   const tables = slide.getTables();
 
   for (let table of tables) {
@@ -2828,7 +2833,7 @@ function translateTableInSlideWithFormatPreservation(slide, src, tgt) {
             backgroundColor: originalTextStyle.getBackgroundColor()
           };
 
-          const translatedText = translateWithGoogle(originalText, src, tgt);
+          const translatedText = translateWithGoogleListAwareNew(originalText, src, tgt, enableProofread);
           textRange.setText(translatedText);
 
           // 書式を復元
@@ -2857,13 +2862,13 @@ function translateTableInSlideWithFormatPreservation(slide, src, tgt) {
 /**
  * 全てのスライドを翻訳する（書式保持版）
  */
-function translateAllSlides(src, tgt) {
+function translateAllSlides(src, tgt, enableProofread = true) {
   const presentation = SlidesApp.getActivePresentation();
   const slides = presentation.getSlides();
 
   for (let slide of slides) {
-    translateSlide(slide, src, tgt);
-    translateTableInSlideWithFormatPreservation(slide, src, tgt);
+    translateSlide(slide, src, tgt, enableProofread);
+    translateTableInSlideWithFormatPreservation(slide, src, tgt, enableProofread);
   }
 
   Utilities.sleep(50);
@@ -2901,7 +2906,7 @@ function proofreadSlideWithFormatPreservation(slide) {
 /**
  * 特定のスライドページを翻訳する（書式保持版）
  */
-function translateSpecificPage(src, tgt) {
+function translateSpecificPage(src, tgt, enableProofread = true) {
   const presentation = SlidesApp.getActivePresentation();
   const slides = presentation.getSlides();
   const pageNumber = getPageNumberFromUser();
@@ -2911,8 +2916,8 @@ function translateSpecificPage(src, tgt) {
   }
 
   const slide = slides[pageNumber - 1];
-  translateSlide(slide, src, tgt);
-  translateTableInSlideWithFormatPreservation(slide, src, tgt);
+  translateSlide(slide, src, tgt, enableProofread);
+  translateTableInSlideWithFormatPreservation(slide, src, tgt, enableProofread);
   
   Utilities.sleep(50);
 }
@@ -2936,7 +2941,7 @@ function proofreadSpecificPage() {
 /**
  * スピーカーノートを翻訳する（書式保持版）
  */
-function translateSpeakerNotesWithFormatPreservation(slide, src, tgt) {
+function translateSpeakerNotesWithFormatPreservation(slide, src, tgt, enableProofread = true) {
   try {
     const speakerNotesShape = slide.getNotesPage().getSpeakerNotesShape();
     const textRange = speakerNotesShape.getText();
@@ -2956,7 +2961,7 @@ function translateSpeakerNotesWithFormatPreservation(slide, src, tgt) {
       const paragraphFormat = collectParagraphFormat(paragraph);
       const characterFormats = collectCharacterFormats(paragraphRange);
       
-      const translatedText = translateWithGoogle(originalText, src, tgt);
+      const translatedText = translateWithGoogleListAwareNew(originalText, src, tgt, enableProofread);
       
       paragraphRange.setText(translatedText);
       
@@ -3080,17 +3085,23 @@ function databricksProofreadSpecificPage() {
 /**
  * Databricks APIを使用してテキストを校正する（保護機能付き）
  */
+/**
+ * Databricks APIを使用してテキストを校正する（保護機能付き・リスト対応版）
+ */
 function proofreadWithDatabricks(text) {
   if (!text || typeof text !== 'string' || text.trim() === '') {
     return text;
   }
 
-  const customExclusions = getCustomExclusions();
-  const allExclusions = { ...TRANSLATION_EXCLUSIONS, ...customExclusions };
-  
-  const exclusionList = Object.keys(allExclusions).join(', ');
+  // リスト構造を保持しながら処理
+  return processTextWithListPreservationNew(text, function(textToProofread) {
+    return protectAndTranslateWithReplacement(textToProofread, function(protectedText) {
+      const customExclusions = getCustomExclusions();
+      const allExclusions = { ...TRANSLATION_EXCLUSIONS, ...customExclusions };
+      
+      const exclusionList = Object.keys(allExclusions).slice(0, 50).join(', ');
 
-  const prompt = `以下の日本語テキストをプレゼンテーション用として自然で読みやすく校正してください。
+      const prompt = `以下の日本語テキストをプレゼンテーション用として自然で読みやすく校正してください。
 
 重要な注意事項：
 以下の技術用語・サービス名は絶対に変更せず、そのまま保持してください：
@@ -3104,73 +3115,85 @@ ${exclusionList}
 5. 英語と日本語の間に適切なスペースを入れる
 6. 文章の意味は変えずに、より自然な日本語にする
 7. 上記の技術用語・サービス名は変更厳禁
-8. 校正後のテキストのみを返してください
+8. 校正後のテキストのみを返してください（説明文は不要）
 
-元のテキスト：${text}
+元のテキスト：${protectedText}
 
 校正後：`;
 
-  const apiUrl = `https://${DATABRICKS_WORKSPACE}.cloud.databricks.com/serving-endpoints/${DATABRICKS_MODEL_ENDPOINT}/invocations`;
-  
-  const payload = {
-    inputs: {
-      messages: [
-        {
-          role: "system",
-          content: "あなたは日本語の校正専門家です。技術用語やサービス名は絶対に変更せず、プレゼンテーション用の文書を自然で読みやすい日本語に校正してください。"
-        },
-        {
-          role: "user",
-          content: prompt
+      const apiUrl = `https://${DATABRICKS_WORKSPACE}.cloud.databricks.com/serving-endpoints/${DATABRICKS_MODEL_ENDPOINT}/invocations`;
+      
+      const payload = {
+        inputs: {
+          messages: [
+            {
+              role: "system",
+              content: "あなたは日本語の校正専門家です。技術用語やサービス名は絶対に変更せず、プレゼンテーション用の文書を自然で読みやすい日本語に校正してください。校正結果のみを返し、説明は不要です。"
+            },
+            {
+              role: "user",
+              content: prompt
+            }
+          ],
+          max_tokens: 1000,
+          temperature: 0.3,
+          top_p: 0.9
         }
-      ],
-      max_tokens: 1000,
-      temperature: 0.3,
-      top_p: 0.9
-    }
-  };
+      };
 
-  const options = {
-    method: 'POST',
-    headers: {
-      'Authorization': `Bearer ${DATABRICKS_TOKEN}`,
-      'Content-Type': 'application/json'
-    },
-    payload: JSON.stringify(payload)
-  };
+      const options = {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${DATABRICKS_TOKEN}`,
+          'Content-Type': 'application/json'
+        },
+        payload: JSON.stringify(payload),
+        muteHttpExceptions: true
+      };
 
-  try {
-    const response = UrlFetchApp.fetch(apiUrl, options);
-    const responseText = response.getContentText();
-    const responseJson = JSON.parse(responseText);
-    
-    if (responseJson.choices && responseJson.choices.length > 0) {
-      let correctedText = responseJson.choices[0].message.content;
-      
-      correctedText = correctedText.replace(/^.*?校正後[：:]\s*/m, '');
-      correctedText = correctedText.replace(/^.*?結果[：:]\s*/m, '');
-      correctedText = correctedText.replace(/^校正された文章[：:]\s*/m, '');
-      correctedText = correctedText.trim();
-      
-      const lines = correctedText.split('\n');
-      if (lines.length > 1 && lines[0].length > 10) {
-        correctedText = lines[0];
+      try {
+        const response = UrlFetchApp.fetch(apiUrl, options);
+        const responseCode = response.getResponseCode();
+        
+        if (responseCode !== 200) {
+          console.log('Databricks APIエラー (ステータス:', responseCode, ')');
+          return advancedJapaneseProofread(protectedText);
+        }
+        
+        const responseText = response.getContentText();
+        const responseJson = JSON.parse(responseText);
+        
+        if (responseJson.choices && responseJson.choices.length > 0) {
+          let correctedText = responseJson.choices[0].message.content;
+          
+          // 余分な説明文を除去
+          correctedText = correctedText.replace(/^.*?校正後[：:]\s*/m, '');
+          correctedText = correctedText.replace(/^.*?結果[：:]\s*/m, '');
+          correctedText = correctedText.replace(/^校正された文章[：:]\s*/m, '');
+          correctedText = correctedText.trim();
+          
+          // 複数行ある場合は最初の行のみを使用
+          const lines = correctedText.split('\n');
+          if (lines.length > 1 && lines[0].length > 10) {
+            correctedText = lines[0];
+          }
+          
+          return correctedText || protectedText;
+        } else if (responseJson.predictions && responseJson.predictions.length > 0) {
+          let correctedText = responseJson.predictions[0];
+          correctedText = correctedText.replace(/^.*?校正後[：:]\s*/m, '');
+          correctedText = correctedText.trim();
+          return correctedText || protectedText;
+        } else {
+          console.log('Databricks API からの応答が不正です:', responseJson);
+          return advancedJapaneseProofread(protectedText);
+        }
+      } catch (error) {
+        console.log('Databricks API エラー:', error);
+        return advancedJapaneseProofread(protectedText);
       }
-      
-      return correctedText || text;
-    } else if (responseJson.predictions && responseJson.predictions.length > 0) {
-      let correctedText = responseJson.predictions[0];
-      correctedText = correctedText.replace(/^.*?校正後[：:]\s*/m, '');
-      correctedText = correctedText.trim();
-      return correctedText || text;
-    } else {
-      console.log('Databricks API からの応答が不正です:', responseJson);
-      return text;
-    }
-  } catch (error) {
-    console.log('Databricks API エラー:', error);
-    return advancedJapaneseProofread(text);
-  }
+    });
+  });
 }
 
 /**
@@ -3227,20 +3250,62 @@ function databricksProofreadSpeakerNotesWithFormatPreservation(slide) {
 }
 
 /**
- * 置換機能のテスト用関数（デバッグ用）
+ * Databricks APIを使用してシェイプのテキストを校正する（リスト対応・書式保持版）
  */
-function testReplacementFunction() {
-  const testText = "We need permission to utilize Databricks API for implementing our methodology.";
+function databricksProofreadShapeWithListAwareFormatPreservation(shape) {
+  const textRange = shape.getText();
+  const fullText = textRange.asString();
   
-  console.log('元のテキスト:', testText);
+  if (fullText.trim() === '') return;
   
-  // 置換機能を使用
-  const result = protectAndTranslateWithReplacement(testText, (text) => {
-    // テスト用：翻訳をシミュレート（実際にはLanguageApp.translateを使用）
-    return text;
-  });
-  
-  console.log('置換後:', result);
-  // 期待結果: "We need authorization to utilize Databricks API for implementing our methodology."
-  // (permissionがauthorizationに置換される)
+  try {
+    const paragraphs = textRange.getParagraphs();
+    const listInfo = analyzeListStructure(fullText);
+    
+    if (listInfo.isListText) {
+      console.log('リスト構造を検出（校正）: ' + listInfo.listType + ', ' + listInfo.totalItems + '項目');
+      
+      const proofreadText = proofreadWithDatabricks(fullText);
+      
+      textRange.setText(proofreadText);
+      
+      // 基本的な書式復元
+      try {
+        if (paragraphs.length > 0) {
+          const defaultFormat = collectParagraphFormat(paragraphs[0]);
+          const newParagraphs = textRange.getParagraphs();
+          for (let i = 0; i < newParagraphs.length; i++) {
+            restoreParagraphFormat(newParagraphs[i], defaultFormat);
+          }
+        }
+      } catch (error) {
+        console.log('リスト書式復元エラー（校正）:', error);
+      }
+      
+    } else {
+      // 通常のテキスト処理
+      for (let i = 0; i < paragraphs.length; i++) {
+        const paragraph = paragraphs[i];
+        const paragraphRange = paragraph.getRange();
+        const originalText = paragraphRange.asString();
+        
+        if (originalText.trim() === '') continue;
+        
+        const paragraphFormat = collectParagraphFormat(paragraph);
+        const characterFormats = collectCharacterFormats(paragraphRange);
+        
+        const proofreadText = proofreadWithDatabricks(originalText);
+        
+        paragraphRange.setText(proofreadText);
+        
+        restoreParagraphFormat(paragraph, paragraphFormat);
+        restoreCharacterFormats(paragraphRange, characterFormats, originalText, proofreadText);
+      }
+    }
+    
+  } catch (error) {
+    console.log('Databricksシェイプ校正エラー:', error);
+    const proofreadText = proofreadWithDatabricks(fullText);
+    textRange.setText(proofreadText);
+  }
 }
