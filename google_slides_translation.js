@@ -673,6 +673,7 @@ const TRANSLATION_EXCLUSIONS = {
 
 // 追加
 'Lakebase':'Lakebase',
+'go/':'go/', 
 'Tick Data':'Tick Data',
 'Refined':'Refined',
 'Raw': 'Raw',
