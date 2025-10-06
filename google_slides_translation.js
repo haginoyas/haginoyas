@@ -773,6 +773,7 @@ const TRANSLATION_EXCLUSIONS = {
 'EC2': 'EC2',
 'Amazon ECR': 'Amazon ECR',
 'Amazon Aurora': 'Amazon Aurora',
+'Aurora': 'Aurora',
 'Databricks Workspace': 'Databricks Workspace',
 'EMR': 'EMR',
 'Elasticsearch': 'Elasticsearch',
