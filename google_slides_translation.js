@@ -1920,28 +1920,28 @@ function protectAndTranslateWithReplacement(text, translationFunction) {
   // 除外用語をプレースホルダーに置換
   Object.entries(allExclusions).forEach(([key, value]) => {
     const escapedTerm = key.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-    const regex = new RegExp(`\\b${escapedTerm}\\b`, 'g');
+    const regex = new RegExp(`\\b${escapedTerm}\\b`, 'gi');
     
     protectedText = protectedText.replace(regex, (match) => {
       const placeholder = `※${placeholderIndex}※`;
       
-//      // キーと値が異なる場合は置換、同じ場合は保護のみ
-//      if (key.toLowerCase() !== value.toLowerCase()) {
-//        // 置換機能：元の文字列の大文字・小文字パターンを保持
-//        placeholders[placeholder] = preserveCase(match, value);
-//      } else {
-//        // 保護機能：元の文字列をそのまま保持
-//        placeholders[placeholder] = match;
-//      }
+      // キーと値が異なる場合は置換、同じ場合は保護のみ
+      if (key.toLowerCase() !== value.toLowerCase()) {
+        // 置換機能：元の文字列の大文字・小文字パターンを保持
+        placeholders[placeholder] = preserveCase(match, value);
+      } else {
+        // 保護機能：元の文字列をそのまま保持
+        placeholders[placeholder] = match;
+      }
       // 修正前: preserveCase関数で大文字小文字パターンを保持
-if (key.toLowerCase() !== value.toLowerCase()) {
-  placeholders[placeholder] = preserveCase(match, value);
-} else {
-  placeholders[placeholder] = match;
-}
+// if (key.toLowerCase() !== value.toLowerCase()) {
+//   placeholders[placeholder] = preserveCase(match, value);
+// } else {
+//  placeholders[placeholder] = match;
+// }
 
 // 修正後: 辞書の値をそのまま使用
-placeholders[placeholder] = value;
+// placeholders[placeholder] = value;
       
       placeholderIndex++;
       return placeholder;
