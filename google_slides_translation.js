@@ -693,6 +693,7 @@ const TRANSLATION_EXCLUSIONS = {
 'Authorization':'認可',  // 認可に置換
 
 // 追加
+'production':'プロダクション環境', 
 'maintenance tax':'維持費', 
 'Reverse-ETL':'Reverse-ETL',
 'Reverse ETL':'Reverse ETL',
