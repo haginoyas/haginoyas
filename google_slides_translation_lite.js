@@ -257,7 +257,7 @@ function reduceTextSize(text) {
     const textStyle = text.getTextStyle();
     if (textStyle.getFontSize() !== null) {
       // フォントサイズを減らす
-      textStyle.setFontSize((textStyle.getFontSize() * 0.8).toFixed());
+      textStyle.setFontSize((textStyle.getFontSize() * 0.9).toFixed());
     }
   }
 }
