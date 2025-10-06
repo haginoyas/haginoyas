@@ -672,6 +672,7 @@ const TRANSLATION_EXCLUSIONS = {
 'Authorization':'認可',  // 認可に置換
 
 // 追加
+'Lakebase':'Lakebase',
 'Tick Data':'Tick Data',
 'Refined':'Refined',
 'Raw': 'Raw',
