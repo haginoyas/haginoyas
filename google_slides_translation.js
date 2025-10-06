@@ -694,9 +694,10 @@ const TRANSLATION_EXCLUSIONS = {
 
 // 追加
 'maintenance tax':'維持費', 
+'Reverse-ETL':'Reverse-ETL',
+'Reverse ETL':'Reverse ETL',
 'Lock-in':'Lock-in', 
 'Lakebase':'Lakebase',
-'go/':'go/', 
 'Tick Data':'Tick Data',
 'Refined':'Refined',
 'Raw': 'Raw',
