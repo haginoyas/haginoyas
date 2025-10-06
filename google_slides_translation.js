@@ -693,6 +693,8 @@ const TRANSLATION_EXCLUSIONS = {
 'Authorization':'認可',  // 認可に置換
 
 // 追加
+'maintenance tax':'維持費', 
+'Lock-in':'Lock-in', 
 'Lakebase':'Lakebase',
 'go/':'go/', 
 'Tick Data':'Tick Data',
