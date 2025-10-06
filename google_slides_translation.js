@@ -680,7 +680,7 @@ const TRANSLATION_EXCLUSIONS = {
 'Transform': 'Transform',
 'Ingest': 'Ingest',
 'Delta Lake': 'Delta Lake',
-'Serve': 'Serve',
+// 'Serve': 'Serve',
 'Platinum layer': 'Platinum layer',
 'Analysis/Output': 'Analysis/Output',
 // Databricks 公式
