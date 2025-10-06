@@ -771,6 +771,7 @@ const TRANSLATION_EXCLUSIONS = {
 'Delta Engine': 'Delta Engine',
 'EC2': 'EC2',
 'Amazon ECR': 'Amazon ECR',
+'Amazon Aurora': 'Amazon Aurora',
 'Databricks Workspace': 'Databricks Workspace',
 'EMR': 'EMR',
 'Elasticsearch': 'Elasticsearch',
@@ -2188,7 +2189,7 @@ function containsListPatterns(text) {
     finalResult = basicJapaneseProofread(translatedText);
   }
   
-  Utilities.sleep(50);
+  Utilities.sleep(20);
   return finalResult;
 }
 
@@ -2419,7 +2420,7 @@ function translateSlide(slide, src, tgt, enableProofread = true) {
     }
   }
   
-  Utilities.sleep(50);
+  Utilities.sleep(20);
 }
 
 /**
@@ -2539,7 +2540,7 @@ function translateAllSlides(src, tgt, enableProofread = true) {
     translateTableInSlideWithFormatPreservation(slide, src, tgt, enableProofread);
   }
 
-  Utilities.sleep(50);
+  Utilities.sleep(20);
 }
 
 /**
@@ -2587,7 +2588,7 @@ function translateSpecificPage(src, tgt, enableProofread = true) {
   translateSlide(slide, src, tgt, enableProofread);
   translateTableInSlideWithFormatPreservation(slide, src, tgt, enableProofread);
   
-  Utilities.sleep(50);
+  Utilities.sleep(20);
 }
 
 /**
@@ -2721,7 +2722,7 @@ function databricksProofreadAllSlides() {
     databricksProofreadSlideWithFormatPreservation(slide);
     
     // API制限を考慮してスリープ
-    Utilities.sleep(50);
+    Utilities.sleep(20);
   }
   
   SlidesApp.getUi().alert(`${slides.length}枚のスライドの校正が完了しました。`);
@@ -2767,7 +2768,7 @@ function proofreadWithDatabricks(text) {
       const customExclusions = getCustomExclusions();
       const allExclusions = { ...TRANSLATION_EXCLUSIONS, ...customExclusions };
       
-      const exclusionList = Object.keys(allExclusions).slice(0, 50).join(', ');
+      const exclusionList = Object.keys(allExclusions).slice(0, 20).join(', ');
 
       const prompt = `以下の日本語テキストをプレゼンテーション用として自然で読みやすく校正してください。
 
