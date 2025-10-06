@@ -313,6 +313,17 @@ function translateShapeWithListAwareFormatPreservationNew(shape, slide, src, tgt
         console.log('リスト書式復元エラー:', error);
       }
       
+      // ★追加：リスト翻訳後のフォントサイズ調整
+      if (tgt === 'ja') {
+        const newParagraphs = textRange.getParagraphs();
+        for (let i = 0; i < newParagraphs.length; i++) {
+          const paragraphRange = newParagraphs[i].getRange();
+          if (paragraphRange.asString().trim() !== '') {
+            reduceTextSize(paragraphRange);
+          }
+        }
+      }
+      
     } else {
       // 通常のテキスト処理
       for (let i = 0; i < paragraphs.length; i++) {
@@ -331,6 +342,11 @@ function translateShapeWithListAwareFormatPreservationNew(shape, slide, src, tgt
         
         restoreParagraphFormat(paragraph, paragraphFormat);
         restoreCharacterFormats(paragraphRange, characterFormats, originalText, translatedText);
+        
+        // ★追加：通常テキスト翻訳後のフォントサイズ調整
+        if (tgt === 'ja' && paragraphRange.asString().trim() !== '') {
+          reduceTextSize(paragraphRange);
+        }
       }
     }
     
@@ -338,6 +354,11 @@ function translateShapeWithListAwareFormatPreservationNew(shape, slide, src, tgt
     console.log('新版シェイプ翻訳エラー:', error);
     const translatedText = translateWithGoogleListAwareNew(fullText, src, tgt, enableProofread);
     textRange.setText(translatedText);
+    
+    // ★追加：エラー時のフォントサイズ調整
+    if (tgt === 'ja') {
+      reduceTextSize(textRange);
+    }
   }
 }
 /**
@@ -2522,6 +2543,11 @@ function translateTableInSlideWithFormatPreservation(slide, src, tgt, enableProo
           // 文字レベルの書式も復元を試行
           restoreCharacterFormats(textRange, characterFormats, originalText, translatedText);
 
+          // ★追加：テーブルセル翻訳後のフォントサイズ調整
+          if (tgt === 'ja' && textRange.asString().trim() !== '') {
+            reduceTextSize(textRange);
+          }
+
         } catch (error) {
           console.log(`セル (${row}, ${col}) をスキップしました: ${error.message}`);
           continue;
@@ -2979,5 +3005,18 @@ function databricksProofreadShapeWithListAwareFormatPreservation(shape) {
     console.log('Databricksシェイプ校正エラー:', error);
     const proofreadText = proofreadWithDatabricks(fullText);
     textRange.setText(proofreadText);
+  }
+}
+/**
+ * テキストのサイズを減らす
+ * @param {TextRange} textRange テキスト範囲
+ */
+function reduceTextSize(textRange) {
+  if (textRange.asString().trim() !== "") {
+    const textStyle = textRange.getTextStyle();
+    if (textStyle.getFontSize() !== null) {
+      // フォントサイズを90%に縮小
+      textStyle.setFontSize(Math.round(textStyle.getFontSize() * 0.9));
+    }
   }
 }
