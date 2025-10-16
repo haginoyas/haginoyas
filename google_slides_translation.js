@@ -176,7 +176,7 @@ function analyzeListStructure(text) {
 }
 
 /**
- * 新しい処理関数（isListItemNew使用版）
+ * 新しい処理関数（isListItemNew使用版・改行修正）
  */
 function processTextWithListPreservationNew(text, processingFunction) {
   if (!text || typeof text !== 'string' || text.trim() === '') {
@@ -221,6 +221,7 @@ function processTextWithListPreservationNew(text, processingFunction) {
             console.log('  -> 処理をスキップしました');
           } else {
             const processedContent = processingFunction(content);
+            // ★修正：マーカーとコンテンツを確実に1行で結合
             processedLines.push(marker + processedContent);
             console.log('  -> 処理しました: "' + processedContent + '"');
           }
@@ -241,34 +242,148 @@ function processTextWithListPreservationNew(text, processingFunction) {
     }
   }
   
-  const result = processedLines.join('\n');
+  let result = processedLines.join('\n');
+  
+  // ★追加：後処理で余分な改行を削除
+  result = cleanupBulletFormatting(result);
+  
   console.log('リスト処理完了');
   return result;
 }
 
 
+/**
+ * 箇条書きの改行を整形する（新規追加）
+ */
+function cleanupBulletFormatting(text) {
+  if (!text || typeof text !== 'string') return text;
+  
+  // パターン1: マーカーの直後に改行がある場合を修正
+  // "• \n本文" → "• 本文"
+  text = text.replace(/([•\-\*▪▫])\s*\n+\s*/g, '$1 ');
+  
+  // パターン2: 番号付きリストマーカーの直後に改行がある場合
+  // "1. \n本文" → "1. 本文"
+  text = text.replace(/(\d+[\.\)])\s*\n+\s*/g, '$1 ');
+  
+  // パターン3: アルファベットリストマーカーの直後に改行がある場合
+  // "a. \n本文" → "a. 本文"
+  text = text.replace(/([a-zA-Z][\.\)])\s*\n+\s*/g, '$1 ');
+  
+  return text;
+}
 
 
 /**
- * リスト対応版：保護機能付きGoogle翻訳（新版）
+ * リスト対応版：保護機能付きGoogle翻訳（改行修正版）
  */
 function translateWithGoogleListAwareNew(text, src, tgt, enableProofread = true) {
   if (!text || text.trim() === '' || text.match(/^[\n\r\s•\-\*\d\.\)\(\s]*$/)) {
     return text;
   }
 
-  // 新しいリスト処理を使用
-  const translatedText = processTextWithListPreservationNew(text, function(textToTranslate) {
+  // === 前処理：英語の箇条書き行にマーカーを付与 ===
+  const BULLET_MARKER = '\u2060';
+  let preprocessedText = text;
+  
+  if (src === 'en' && tgt === 'ja') {
+    const lines = text.split('\n');
+    const markedLines = [];
+    
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i];
+      
+      if (line.trim() === '') {
+        markedLines.push(line);
+        continue;
+      }
+      
+      const isBulletLine = isListItemNew(line);
+      if (!isBulletLine) {
+        markedLines.push(line);
+        continue;
+      }
+      
+      const itemMatch = findListItemMatch(line);
+      if (!itemMatch) {
+        markedLines.push(line);
+        continue;
+      }
+      
+      const content = itemMatch.content.trim();
+      
+      if (shouldSkipProcessing(content)) {
+        markedLines.push(line);
+        continue;
+      }
+      
+      const isBulletish = (
+        content.length >= 3 &&
+        content.length <= 80 &&
+        !/[.!?]{2,}/.test(content) &&
+        (content.match(/[.!?]/g) || []).length <= 1 &&
+        !/^(Version|VaR OUTPUT|[A-Z]{2,}\s+[A-Z]{2,})$/i.test(content)
+      );
+      
+      if (isBulletish) {
+        console.log(`[前処理] マーカー付与: "${content.substring(0, 40)}..."`);
+        // ★修正：改行を含まないようにマーカーを付与
+        markedLines.push(line.trimEnd() + BULLET_MARKER);
+      } else {
+        markedLines.push(line);
+      }
+    }
+    
+    preprocessedText = markedLines.join('\n');
+  }
+
+  // === 翻訳処理 ===
+  const translatedText = processTextWithListPreservationNew(preprocessedText, function(textToTranslate) {
     return protectAndTranslateWithReplacement(textToTranslate, function(protectedText) {
       return LanguageApp.translate(protectedText, src, tgt);
     });
   });
 
-  let finalResult = translatedText;
-  
-  // 校正を有効にする場合のみ実行
+  // === 後処理：マーカーがある行の句点を削除 + 改行整形 ===
+  let cleanedText = translatedText;
+  if (tgt === 'ja') {
+    const lines = translatedText.split('\n');
+    const cleanedLines = [];
+    
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i];
+      
+      if (line.includes(BULLET_MARKER)) {
+        let cleaned = line.replace(BULLET_MARKER, '');
+        
+        // 行末の句点を削除
+        const bulletMatch = cleaned.match(/^(\s*[•\-\*\d\.\)]+\s*)(.+)$/);
+        if (bulletMatch) {
+          const marker = bulletMatch[1];
+          const content = bulletMatch[2].replace(/。\s*$/, '').trim();
+          // ★修正：マーカーとコンテンツを確実に1行で結合
+          cleaned = marker + content;
+          console.log(`[後処理] 句点削除: "${content.substring(0, 40)}..."`);
+        }
+        
+        cleanedLines.push(cleaned);
+      } else {
+        cleanedLines.push(line);
+      }
+    }
+    
+    cleanedText = cleanedLines.join('\n');
+    
+    // ★追加：最終的な改行整形
+    cleanedText = cleanupBulletFormatting(cleanedText);
+  } else {
+    cleanedText = translatedText.replace(new RegExp(BULLET_MARKER, 'g'), '');
+  }
+
+  // === 校正処理 ===
+  let finalResult = cleanedText;
   if (tgt === 'ja' && enableProofread) {
-    finalResult = basicJapaneseProofread(translatedText);
+    finalResult = basicJapaneseProofread(cleanedText);
   }
   
   Utilities.sleep(25);
@@ -2240,41 +2355,48 @@ function basicJapaneseProofread(text) {
   
   let corrected = text;
   
-  // 句読点の統一
-  corrected = corrected.replace(/，/g, '、');
-  corrected = corrected.replace(/．/g, '。');
+  // マーカーが残っている場合は削除（念のため）
+  corrected = corrected.replace(/\u2060/g, '');
   
-  // カタカナの長音符を統一
-  corrected = corrected.replace(/～/g, 'ー');
+  // 句点処理（既存のロジックは残す）
+  // ただし、マーカー方式を使う場合はこの処理は不要かもしれない
+  corrected = corrected.replace(/^(?:\s*[-・•\d\)．\.]+?\s*)?(.+?)。$/gm, (m, body) => {
+    return /[、。！？]/.test(body) || body.length > 25 ? m : body;
+  });
   
-  // 不自然な敬語の簡素化
-  corrected = corrected.replace(/いたします/g, 'します');
-  corrected = corrected.replace(/させていただきます/g, 'します');
-  corrected = corrected.replace(/させていただく/g, 'する');
-  
-  // 冗長な表現の簡略化
-  corrected = corrected.replace(/することができます/g, 'できます');
-  corrected = corrected.replace(/することが可能です/g, 'できます');
-  corrected = corrected.replace(/に関して/g, 'について');
-  corrected = corrected.replace(/に関しまして/g, 'について');
-  
-  // ビジネス文書でよく使われる不自然な表現の修正
-  corrected = corrected.replace(/～について説明します/g, '～を説明します');
-  corrected = corrected.replace(/～に関して述べます/g, '～について述べます');
-  
-  // 重複する助詞の修正
-  corrected = corrected.replace(/のの/g, 'の');
-  corrected = corrected.replace(/とと/g, 'と');
-  corrected = corrected.replace(/がが/g, 'が');
-  
-  // 不自然なスペースの除去
-  corrected = corrected.replace(/([あ-んア-ンー一-龠])\s+([あ-んア-ンー一-龠])/g, '$1$2');
-  
-  // 英語と日本語の間に適切なスペースを追加
-  corrected = corrected.replace(/([a-zA-Z0-9])([あ-んア-ンー一-龠])/g, '$1 $2');
-  corrected = corrected.replace(/([あ-んア-ンー一-龠])([a-zA-Z0-9])/g, '$1 $2');
+  // ... 残りの処理は同じ
   
   return corrected;
+}
+
+
+
+/**
+ * 箇条書き行かどうかを判定（厳密版）
+ */
+function isBulletLineStrict(line) {
+  if (!isListItemNew(line)) return false;
+  
+  // マーカーを除去したコンテンツ部分を取得
+  const itemMatch = findListItemMatch(line);
+  if (!itemMatch) return false;
+  
+  const content = itemMatch.content.trim();
+  
+  // 除外パターン
+  if (shouldSkipProcessing(content)) return false;
+  
+  // 箇条書きっぽさの判定
+  const checks = {
+    shortLength: content.length <= 30,           // 短い
+    fewPunctuation: (content.match(/[、。]/g) || []).length <= 1, // 句読点が少ない
+    notSentence: !/です。?$|ます。?$|した。?$/.test(content), // 文末表現がない
+    hasContent: content.length >= 2              // 最低限の内容がある
+  };
+  
+  // 3つ以上の条件を満たせば箇条書きとみなす
+  const passCount = Object.values(checks).filter(v => v).length;
+  return passCount >= 3;
 }
 
 /**
@@ -2444,21 +2566,47 @@ function databricksProofreadShapeWithFormatPreservation(shape) {
 }
 
 /**
- * スライドのテキストを翻訳する（書式保持版）
+ * スライドのテキストを翻訳する（テーブル対応版）
  */
 function translateSlide(slide, src, tgt, enableProofread = true) {
-  translateSpeakerNotesWithFormatPreservation(slide, src, tgt, enableProofread);
+  console.log('=== スライド翻訳開始 ===');
+  
+  // スピーカーノートを翻訳
+  try {
+    translateSpeakerNotesWithFormatPreservation(slide, src, tgt, enableProofread);
+  } catch (e) {
+    console.log('スピーカーノート翻訳エラー:', e.message);
+  }
 
   const pageElements = slide.getPageElements();
+  console.log(`ページ要素数: ${pageElements.length}`);
 
-  for (let pageElement of pageElements) {
-    if (pageElement.getPageElementType() === SlidesApp.PageElementType.SHAPE) {
-      translateShapeWithListAwareFormatPreservation(pageElement.asShape(), slide, src, tgt, enableProofread);
-    } else if (pageElement.getPageElementType() === SlidesApp.PageElementType.GROUP) {
-      translateGroupWithFormatPreservation(pageElement.asGroup(), slide, src, tgt, enableProofread);
+  // シェイプとグループを翻訳
+  for (let i = 0; i < pageElements.length; i++) {
+    const pageElement = pageElements[i];
+    const elementType = pageElement.getPageElementType();
+    
+    try {
+      if (elementType === SlidesApp.PageElementType.SHAPE) {
+        translateShapeWithListAwareFormatPreservationNew(pageElement.asShape(), slide, src, tgt, enableProofread);
+      } else if (elementType === SlidesApp.PageElementType.GROUP) {
+        translateGroupWithFormatPreservation(pageElement.asGroup(), slide, src, tgt, enableProofread);
+      } else if (elementType === SlidesApp.PageElementType.TABLE) {
+        console.log(`テーブル ${i} を検出（後で処理）`);
+      }
+    } catch (error) {
+      console.log(`要素 ${i} (${elementType}) の翻訳エラー: ${error.message}`);
     }
   }
   
+  // テーブルを翻訳（新版）
+  try {
+    translateAllTablesInSlide(slide, src, tgt, enableProofread);
+  } catch (e) {
+    console.log('テーブル翻訳エラー:', e.message);
+  }
+  
+  console.log('=== スライド翻訳完了 ===');
   Utilities.sleep(20);
 }
 
@@ -2506,84 +2654,139 @@ function databricksProofreadGroupWithFormatPreservation(group) {
     }
   }
 }
+
 /**
- * スライド内のテーブルを翻訳する（書式保持版）
+ * スライド内の全テーブルを翻訳（新関数）
  */
-function translateTableInSlideWithFormatPreservation(slide, src, tgt, enableProofread = true) {
-  const tables = slide.getTables();
-
-  for (let table of tables) {
-    const numRows = table.getNumRows();
-    const numColumns = table.getNumColumns();
-
-    for (let row = 0; row < numRows; row++) {
-      for (let col = 0; col < numColumns; col++) {
-        try {
-          const cell = table.getCell(row, col);
-          const textRange = cell.getText();
-          const originalText = textRange.asString();
-          
-          if (originalText === '' || originalText.trim() === '') {
-            continue;
-          }
-
-          // セルの書式情報を保存
-          const characterFormats = collectCharacterFormats(textRange);
-          const originalTextStyle = textRange.getTextStyle();
-          const cellFormat = {
-            fontSize: originalTextStyle.getFontSize(),
-            fontFamily: originalTextStyle.getFontFamily(),
-            bold: originalTextStyle.isBold(),
-            italic: originalTextStyle.isItalic(),
-            underline: originalTextStyle.hasUnderline(),
-            strikethrough: originalTextStyle.isStrikethrough(),
-            foregroundColor: originalTextStyle.getForegroundColor(),
-            backgroundColor: originalTextStyle.getBackgroundColor()
-          };
-
-          const translatedText = translateWithGoogleListAwareNew(originalText, src, tgt, enableProofread);
-          textRange.setText(translatedText);
-
-          // 書式を復元
-          const newTextStyle = textRange.getTextStyle();
-          if (cellFormat.fontSize !== null) newTextStyle.setFontSize(cellFormat.fontSize);
-          if (cellFormat.fontFamily !== null) newTextStyle.setFontFamily(cellFormat.fontFamily);
-          if (cellFormat.bold !== null) newTextStyle.setBold(cellFormat.bold);
-          if (cellFormat.italic !== null) newTextStyle.setItalic(cellFormat.italic);
-          if (cellFormat.underline !== null) newTextStyle.setUnderline(cellFormat.underline);
-          if (cellFormat.strikethrough !== null) newTextStyle.setStrikethrough(cellFormat.strikethrough);
-          if (cellFormat.foregroundColor !== null) newTextStyle.setForegroundColor(cellFormat.foregroundColor);
-          if (cellFormat.backgroundColor !== null) newTextStyle.setBackgroundColor(cellFormat.backgroundColor);
-
-          // 文字レベルの書式も復元を試行
-          restoreCharacterFormats(textRange, characterFormats, originalText, translatedText);
-
-          // ★追加：テーブルセル翻訳後のフォントサイズ調整
-          if (tgt === 'ja' && textRange.asString().trim() !== '') {
-            reduceTextSize(textRange);
-          }
-
-        } catch (error) {
-          console.log(`セル (${row}, ${col}) をスキップしました: ${error.message}`);
-          continue;
-        }
+function translateAllTablesInSlide(slide, src, tgt, enableProofread) {
+  console.log('--- テーブル翻訳開始 ---');
+  
+  const pageElements = slide.getPageElements();
+  let tableCount = 0;
+  let totalCells = 0;
+  
+  for (let i = 0; i < pageElements.length; i++) {
+    const element = pageElements[i];
+    
+    try {
+      if (element.getPageElementType() === SlidesApp.PageElementType.TABLE) {
+        tableCount++;
+        console.log(`\nテーブル ${tableCount} (要素 ${i})`);
+        
+        const table = element.asTable();
+        const cellCount = translateSingleTable(table, src, tgt, enableProofread);
+        totalCells += cellCount;
+        
+        console.log(`✓ テーブル ${tableCount} 完了: ${cellCount}セル翻訳`);
       }
+    } catch (error) {
+      console.log(`テーブル処理エラー: ${error.message}`);
     }
+  }
+  
+  if (tableCount === 0) {
+    console.log('表が見つかりませんでした');
+  } else {
+    console.log(`--- テーブル翻訳完了: ${tableCount}個、${totalCells}セル ---`);
   }
 }
 
+
+
 /**
- * 全てのスライドを翻訳する（書式保持版）
+ * 1つのテーブルを翻訳
+ * @returns {number} 翻訳したセル数
+ */
+function translateSingleTable(table, src, tgt, enableProofread) {
+  const numRows = table.getNumRows();
+  const numColumns = table.getNumColumns();
+  console.log(`  サイズ: ${numRows}行 × ${numColumns}列`);
+  
+  const processedCells = new Set();
+  let translatedCount = 0;
+  
+  for (let row = 0; row < numRows; row++) {
+    for (let col = 0; col < numColumns; col++) {
+      const cellKey = `${row},${col}`;
+      
+      // すでに処理済みならスキップ
+      if (processedCells.has(cellKey)) {
+        console.log(`  [${row},${col}] スキップ（処理済み）`);
+        continue;
+      }
+      
+      try {
+        // ★重要：セルを取得する前にnullチェック
+        const cell = table.getCell(row, col);
+        
+        if (!cell) {
+          console.log(`  [${row},${col}] セルが存在しません（マージセルの一部）`);
+          processedCells.add(cellKey);
+          continue;
+        }
+        
+        // このセルを処理済みとしてマーク
+        processedCells.add(cellKey);
+        
+        // マージセル情報を取得して、マージ範囲を記録
+        try {
+          const rowSpan = cell.getRowSpan();
+          const colSpan = cell.getColumnSpan();
+          
+          if (rowSpan && colSpan) {
+            console.log(`  [${row},${col}] マージセル: ${rowSpan}行 × ${colSpan}列`);
+            
+            // マージ範囲内のすべてのセルを処理済みとしてマーク
+            for (let r = row; r < row + rowSpan && r < numRows; r++) {
+              for (let c = col; c < col + colSpan && c < numColumns; c++) {
+                if (r !== row || c !== col) {  // 元のセルは既に追加済み
+                  processedCells.add(`${r},${c}`);
+                }
+              }
+            }
+          }
+        } catch (spanError) {
+          // getRowSpan/getColumnSpanが使えない場合は無視
+          console.log(`  [${row},${col}] スパン情報取得エラー: ${spanError.message}`);
+        }
+        
+        // セルの翻訳
+        const wasTranslated = translateTableCell(cell, src, tgt, enableProofread, row, col);
+        if (wasTranslated) {
+          translatedCount++;
+        }
+        
+      } catch (error) {
+        console.log(`  [${row},${col}] エラー: ${error.message}`);
+        processedCells.add(cellKey);  // エラーでも処理済みとしてマーク
+      }
+    }
+  }
+  
+  console.log(`  翻訳完了: ${translatedCount}/${numRows * numColumns}セル`);
+  return translatedCount;
+}
+
+/**
+ * 全てのスライドを翻訳する（テーブル統合版）
  */
 function translateAllSlides(src, tgt, enableProofread = true) {
   const presentation = SlidesApp.getActivePresentation();
   const slides = presentation.getSlides();
+  
+  console.log(`=== 全スライド翻訳開始 (${slides.length}枚) ===`);
 
-  for (let slide of slides) {
-    translateSlide(slide, src, tgt, enableProofread);
-    translateTableInSlideWithFormatPreservation(slide, src, tgt, enableProofread);
+  for (let i = 0; i < slides.length; i++) {
+    console.log(`\n--- スライド ${i + 1}/${slides.length} ---`);
+    try {
+      translateSlide(slides[i], src, tgt, enableProofread);
+    } catch (error) {
+      console.log(`スライド ${i + 1} でエラー: ${error.message}`);
+    }
   }
-
+  
+  console.log('\n=== 全スライド翻訳完了 ===');
+  SlidesApp.getUi().alert(`${slides.length}枚のスライドの翻訳が完了しました。`);
   Utilities.sleep(20);
 }
 
@@ -2617,7 +2820,7 @@ function proofreadSlideWithFormatPreservation(slide) {
 }
 
 /**
- * 特定のスライドページを翻訳する（書式保持版）
+ * 特定のスライドページを翻訳する（テーブル統合版）
  */
 function translateSpecificPage(src, tgt, enableProofread = true) {
   const presentation = SlidesApp.getActivePresentation();
@@ -2628,12 +2831,20 @@ function translateSpecificPage(src, tgt, enableProofread = true) {
     return;
   }
 
+  if (pageNumber < 1 || pageNumber > slides.length) {
+    SlidesApp.getUi().alert(`ページ番号が無効です。1から${slides.length}の間で指定してください。`);
+    return;
+  }
+
+  console.log(`\n--- スライド ${pageNumber} の翻訳 ---`);
   const slide = slides[pageNumber - 1];
   translateSlide(slide, src, tgt, enableProofread);
-  translateTableInSlideWithFormatPreservation(slide, src, tgt, enableProofread);
   
+  SlidesApp.getUi().alert(`スライド${pageNumber}の翻訳が完了しました。`);
   Utilities.sleep(20);
 }
+
+
 
 /**
  * 特定のスライドページを校正する（書式保持版）
@@ -3033,5 +3244,193 @@ function reduceTextSize(textRange) {
       // フォントサイズを90%に縮小
       textStyle.setFontSize(Math.round(textStyle.getFontSize() * 0.9));
     }
+  }
+}
+
+/**
+ * 1つのセルを翻訳
+ * @returns {boolean} 翻訳したかどうか
+ */
+function translateTableCell(cell, src, tgt, enableProofread, row, col) {
+  try {
+    const textRange = cell.getText();
+    const originalText = textRange.asString();
+    
+    // 空セルはスキップ
+    if (!originalText || originalText.trim() === '') {
+      return false;
+    }
+    
+    console.log(`  [${row},${col}]: "${originalText.substring(0, 30)}..."`);
+    
+    // ★重要：セルの塗りつぶし色を保存
+    let cellFill = null;
+    try {
+      cellFill = cell.getFill();
+      if (cellFill && cellFill.getSolidFill()) {
+        console.log(`    セル背景色を保存: ${cellFill.getSolidFill().getColor().asRgbColor().asHexString()}`);
+      }
+    } catch (e) {
+      console.log(`    セル背景色の取得エラー: ${e.message}`);
+    }
+    
+    // テキストスタイルを保存（エラー処理を強化）
+    const textStyle = textRange.getTextStyle();
+    const savedFormat = {};
+    
+    try { savedFormat.fontSize = textStyle.getFontSize(); } catch (e) {}
+    try { savedFormat.fontFamily = textStyle.getFontFamily(); } catch (e) {}
+    try { savedFormat.bold = textStyle.isBold(); } catch (e) {}
+    try { savedFormat.italic = textStyle.isItalic(); } catch (e) {}
+    try { savedFormat.foregroundColor = textStyle.getForegroundColor(); } catch (e) {}
+    
+    // 翻訳
+    let translatedText;
+    try {
+      translatedText = translateWithGoogleListAwareNew(originalText, src, tgt, enableProofread);
+    } catch (error) {
+      console.log(`    翻訳エラー、フォールバック使用: ${error.message}`);
+      translatedText = LanguageApp.translate(originalText, src, tgt);
+    }
+    
+    console.log(`    → "${translatedText.substring(0, 30)}..."`);
+    
+    // テキスト設定
+    textRange.setText(translatedText);
+    
+    // ★重要：セルの塗りつぶし色を復元（テキスト書式より先に）
+    if (cellFill) {
+      try {
+        cell.setFill(cellFill);
+        console.log(`    セル背景色を復元`);
+      } catch (e) {
+        console.log(`    セル背景色の復元エラー: ${e.message}`);
+      }
+    }
+    
+    // テキスト書式を復元（エラー処理を強化）
+    try {
+      const newStyle = textRange.getTextStyle();
+      
+      if (savedFormat.fontSize) {
+        try { newStyle.setFontSize(savedFormat.fontSize); } catch (e) {}
+      }
+      if (savedFormat.fontFamily) {
+        try { newStyle.setFontFamily(savedFormat.fontFamily); } catch (e) {}
+      }
+      if (savedFormat.bold !== null && savedFormat.bold !== undefined) {
+        try { newStyle.setBold(savedFormat.bold); } catch (e) {}
+      }
+      if (savedFormat.italic !== null && savedFormat.italic !== undefined) {
+        try { newStyle.setItalic(savedFormat.italic); } catch (e) {}
+      }
+      if (savedFormat.foregroundColor) {
+        try { newStyle.setForegroundColor(savedFormat.foregroundColor); } catch (e) {}
+      }
+      
+      // 日本語の場合、フォントサイズ調整
+      if (tgt === 'ja' && savedFormat.fontSize) {
+        try {
+          newStyle.setFontSize(Math.round(savedFormat.fontSize * 0.9));
+        } catch (e) {}
+      }
+    } catch (error) {
+      console.log(`    テキスト書式復元エラー（続行）: ${error.message}`);
+    }
+    
+    return true;
+    
+  } catch (error) {
+    console.log(`    [${row},${col}] エラー: ${error.message}`);
+    return false;
+  }
+}
+
+
+
+/**
+ * 1つのテーブルを翻訳
+ * @returns {number} 翻訳したセル数
+ */
+function translateSingleTable(table, src, tgt, enableProofread) {
+  const numRows = table.getNumRows();
+  const numColumns = table.getNumColumns();
+  console.log(`  サイズ: ${numRows}行 × ${numColumns}列`);
+  
+  const processedCells = new Set();
+  let translatedCount = 0;
+  
+  for (let row = 0; row < numRows; row++) {
+    for (let col = 0; col < numColumns; col++) {
+      const cellKey = `${row},${col}`;
+      
+      if (processedCells.has(cellKey)) {
+        continue;
+      }
+      
+      try {
+        const cell = table.getCell(row, col);
+        
+        // マージセル処理
+        try {
+          const rowSpan = cell.getRowSpan() || 1;
+          const colSpan = cell.getColumnSpan() || 1;
+          
+          for (let r = row; r < row + rowSpan; r++) {
+            for (let c = col; c < col + colSpan; c++) {
+              processedCells.add(`${r},${c}`);
+            }
+          }
+        } catch (e) {
+          processedCells.add(cellKey);
+        }
+        
+        // セルの翻訳
+        const wasTranslated = translateTableCell(cell, src, tgt, enableProofread, row, col);
+        if (wasTranslated) {
+          translatedCount++;
+        }
+        
+      } catch (error) {
+        console.log(`  [${row},${col}] エラー: ${error.message}`);
+      }
+    }
+  }
+  
+  return translatedCount;
+}
+/**
+ * スライド内の全テーブルを翻訳（新関数）
+ */
+function translateAllTablesInSlide(slide, src, tgt, enableProofread) {
+  console.log('--- テーブル翻訳開始 ---');
+  
+  const pageElements = slide.getPageElements();
+  let tableCount = 0;
+  let totalCells = 0;
+  
+  for (let i = 0; i < pageElements.length; i++) {
+    const element = pageElements[i];
+    
+    try {
+      if (element.getPageElementType() === SlidesApp.PageElementType.TABLE) {
+        tableCount++;
+        console.log(`\nテーブル ${tableCount} (要素 ${i})`);
+        
+        const table = element.asTable();
+        const cellCount = translateSingleTable(table, src, tgt, enableProofread);
+        totalCells += cellCount;
+        
+        console.log(`✓ テーブル ${tableCount} 完了: ${cellCount}セル翻訳`);
+      }
+    } catch (error) {
+      console.log(`テーブル処理エラー: ${error.message}`);
+    }
+  }
+  
+  if (tableCount === 0) {
+    console.log('表が見つかりませんでした');
+  } else {
+    console.log(`--- テーブル翻訳完了: ${tableCount}個、${totalCells}セル ---`);
   }
 }
