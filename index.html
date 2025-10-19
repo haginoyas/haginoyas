@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <base target="_top">
+  <meta charset="UTF-8">
+  <title>Google Slides 翻訳・校正ツール</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 20px;
+    }
+    
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+      overflow: hidden;
+    }
+    
+    .header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 30px;
+      text-align: center;
+    }
+    
+    .header h1 {
+      font-size: 28px;
+      margin-bottom: 10px;
+    }
+    
+    .header p {
+      font-size: 14px;
+      opacity: 0.9;
+    }
+    
+    .content {
+      padding: 40px;
+    }
+    
+    .section {
+      margin-bottom: 30px;
+      padding: 25px;
+      background: #f8f9fa;
+      border-radius: 12px;
+      border-left: 4px solid #667eea;
+    }
+    
+    .section h2 {
+      color: #333;
+      font-size: 20px;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+    }
+    
+    .section h2::before {
+      content: "▶";
+      margin-right: 10px;
+      color: #667eea;
+      font-size: 14px;
+    }
+    
+    .form-group {
+      margin-bottom: 20px;
+    }
+    
+    label {
+      display: block;
+      margin-bottom: 8px;
+      color: #555;
+      font-weight: 600;
+      font-size: 14px;
+    }
+    
+    input[type="text"],
+    select {
+      width: 100%;
+      padding: 12px 16px;
+      border: 2px solid #e0e0e0;
+      border-radius: 8px;
+      font-size: 14px;
+      transition: all 0.3s;
+    }
+    
+    input[type="text"]:focus,
+    select:focus {
+      outline: none;
+      border-color: #667eea;
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+    
+    .checkbox-group {
+      display: flex;
+      align-items: center;
+      margin-top: 15px;
+    }
+    
+    input[type="checkbox"] {
+      width: 20px;
+      height: 20px;
+      margin-right: 10px;
+      cursor: pointer;
+    }
+    
+    .button-group {
+      display: flex;
+      gap: 15px;
+      margin-top: 20px;
+    }
+    
+    button {
+      flex: 1;
+      padding: 14px 24px;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    
+    .btn-primary {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+    }
+    
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+    }
+    
+    .btn-secondary {
+      background: #6c757d;
+      color: white;
+    }
+    
+    .btn-secondary:hover {
+      background: #5a6268;
+      transform: translateY(-2px);
+    }
+    
+    button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none !important;
+    }
+    
+    .info-box {
+      background: #e7f3ff;
+      border-left: 4px solid #2196F3;
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      font-size: 14px;
+      color: #1976D2;
+    }
+    
+    .info-box strong {
+      display: block;
+      margin-bottom: 5px;
+    }
+    
+    .status {
+      margin-top: 20px;
+      padding: 15px;
+      border-radius: 8px;
+      display: none;
+      font-size: 14px;
+      animation: fadeIn 0.3s;
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .status.success {
+      background: #d4edda;
+      color: #155724;
+      border: 1px solid #c3e6cb;
+      display: block;
+    }
+    
+    .status.error {
+      background: #f8d7da;
+      color: #721c24;
+      border: 1px solid #f5c6cb;
+      display: block;
+    }
+    
+    .status.info {
+      background: #d1ecf1;
+      color: #0c5460;
+      border: 1px solid #bee5eb;
+      display: block;
+    }
+    
+    .loading {
+      display: none;
+      text-align: center;
+      padding: 20px;
+    }
+    
+    .loading.active {
+      display: block;
+    }
+    
+    .spinner {
+      border: 4px solid #f3f3f3;
+      border-top: 4px solid #667eea;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 15px;
+    }
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    
+    .presentation-info {
+      background: white;
+      padding: 15px;
+      border-radius: 8px;
+      margin-top: 15px;
+      border: 2px solid #e0e0e0;
+      display: none;
+    }
+    
+    .presentation-info.active {
+      display: block;
+    }
+    
+    .presentation-info h3 {
+      color: #667eea;
+      margin-bottom: 10px;
+      font-size: 16px;
+    }
+    
+    .presentation-info p {
+      color: #666;
+      font-size: 14px;
+      margin: 5px 0;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>🌐 Google Slides 翻訳・校正ツール</h1>
+      <p>プレゼンテーションを簡単に翻訳・校正できます</p>
+    </div>
+    
+    <div class="content">
+      <!-- プレゼンテーション情報セクション -->
+      <div class="section">
+        <h2>プレゼンテーション設定</h2>
+        
+        <div class="info-box">
+          <strong>📋 プレゼンテーションIDの取得方法：</strong>
+          Google SlidesのURLから取得してください。<br>
+          例: https://docs.google.com/presentation/d/<strong>PRESENTATION_ID</strong>/edit
+        </div>
+        
+        <div class="form-group">
+          <label for="presentationId">プレゼンテーションID *</label>
+          <input type="text" id="presentationId" placeholder="プレゼンテーションIDを入力してください">
+        </div>
+        
+        <button class="btn-secondary" onclick="loadPresentation()" style="width: 100%;">
+          プレゼンテーション情報を読み込む
+        </button>
+        
+        <div id="presentationInfo" class="presentation-info">
+          <h3>✓ プレゼンテーション情報</h3>
+          <p><strong>タイトル:</strong> <span id="presentationTitle">-</span></p>
+          <p><strong>スライド数:</strong> <span id="slideCount">-</span></p>
+        </div>
+      </div>
+      
+      <!-- 翻訳セクション -->
+      <div class="section">
+        <h2>翻訳設定</h2>
+        
+        <div class="form-group">
+          <label for="sourceLang">翻訳元言語</label>
+          <select id="sourceLang">
+            <option value="auto">自動検出</option>
+            <option value="en">英語</option>
+            <option value="ja">日本語</option>
+            <option value="zh-CN">中国語（簡体字）</option>
+            <option value="zh-TW">中国語（繁体字）</option>
+            <option value="ko">韓国語</option>
+            <option value="es">スペイン語</option>
+            <option value="fr">フランス語</option>
+            <option value="de">ドイツ語</option>
+          </select>
+        </div>
+        
+        <div class="form-group">
+          <label for="targetLang">翻訳先言語</label>
+          <select id="targetLang">
+            <option value="ja">日本語</option>
+            <option value="en">英語</option>
+            <option value="zh-CN">中国語（簡体字）</option>
+            <option value="zh-TW">中国語（繁体字）</option>
+            <option value="ko">韓国語</option>
+            <option value="es">スペイン語</option>
+            <option value="fr">フランス語</option>
+            <option value="de">ドイツ語</option>
+          </select>
+        </div>
+        
+        <div class="checkbox-group">
+          <input type="checkbox" id="enableProofread" checked>
+          <label for="enableProofread" style="margin-bottom: 0;">翻訳後に自動校正を実行する</label>
+        </div>
+        
+        <div class="button-group">
+          <button class="btn-primary" onclick="startTranslation()">
+            🌐 翻訳を実行
+          </button>
+        </div>
+      </div>
+      
+      <!-- 校正セクション -->
+      <div class="section">
+        <h2>校正設定</h2>
+        
+        <div class="form-group">
+          <label for="proofreadType">校正方法</label>
+          <select id="proofreadType">
+            <option value="basic">基本校正（Google翻訳ベース）</option>
+            <option value="databricks">高度な校正（Databricks API）</option>
+          </select>
+        </div>
+        
+        <div class="button-group">
+          <button class="btn-primary" onclick="startProofread()">
+            ✏️ 校正を実行
+          </button>
+        </div>
+      </div>
+      
+      <!-- ステータス表示 -->
+      <div class="loading" id="loading">
+        <div class="spinner"></div>
+        <p id="loadingMessage">処理中...</p>
+      </div>
+      
+      <div id="status" class="status"></div>
+    </div>
+  </div>
+  
+  <script>
+    // プレゼンテーション情報を読み込む
+    function loadPresentation() {
+      const presentationId = document.getElementById('presentationId').value.trim();
+      
+      if (!presentationId) {
+        showStatus('error', 'プレゼンテーションIDを入力してください。');
+        return;
+      }
+      
+      showLoading('プレゼンテーション情報を読み込んでいます...');
+      
+      google.script.run
+        .withSuccessHandler(function(result) {
+          hideLoading();
+          if (result.success) {
+            document.getElementById('presentationTitle').textContent = result.title;
+            document.getElementById('slideCount').textContent = result.slideCount;
+            document.getElementById('presentationInfo').classList.add('active');
+            showStatus('success', 'プレゼンテーション情報を読み込みました。');
+          } else {
+            showStatus('error', result.message);
+          }
+        })
+        .withFailureHandler(function(error) {
+          hideLoading();
+          showStatus('error', 'エラーが発生しました: ' + error.message);
+        })
+        .getPresentationInfo(presentationId);
+    }
+    
+    // 翻訳を開始
+    function startTranslation() {
+      const presentationId = document.getElementById('presentationId').value.trim();
+      const sourceLang = document.getElementById('sourceLang').value;
+      const targetLang = document.getElementById('targetLang').value;
+      const enableProofread = document.getElementById('enableProofread').checked;
+      
+      if (!presentationId) {
+        showStatus('error', 'プレゼンテーションIDを入力してください。');
+        return;
+      }
+      
+      if (sourceLang === targetLang && sourceLang !== 'auto') {
+        showStatus('error', '翻訳元と翻訳先の言語が同じです。');
+        return;
+      }
+      
+      if (!confirm('翻訳を開始しますか？処理には時間がかかる場合があります。')) {
+        return;
+      }
+      
+      showLoading('翻訳を実行しています...');
+      disableButtons(true);
+      
+      google.script.run
+        .withSuccessHandler(function(result) {
+          hideLoading();
+          disableButtons(false);
+          if (result.success) {
+            showStatus('success', result.message);
+          } else {
+            showStatus('error', result.message);
+          }
+        })
+        .withFailureHandler(function(error) {
+          hideLoading();
+          disableButtons(false);
+          showStatus('error', 'エラーが発生しました: ' + error.message);
+        })
+        .executeTranslation(presentationId, sourceLang, targetLang, 'all', enableProofread);
+    }
+    
+    // 校正を開始
+    function startProofread() {
+      const presentationId = document.getElementById('presentationId').value.trim();
+      const proofreadType = document.getElementById('proofreadType').value;
+      
+      if (!presentationId) {
+        showStatus('error', 'プレゼンテーションIDを入力してください。');
+        return;
+      }
+      
+      if (!confirm('校正を開始しますか？処理には時間がかかる場合があります。')) {
+        return;
+      }
+      
+      showLoading('校正を実行しています...');
+      disableButtons(true);
+      
+      google.script.run
+        .withSuccessHandler(function(result) {
+          hideLoading();
+          disableButtons(false);
+          if (result.success) {
+            showStatus('success', result.message);
+          } else {
+            showStatus('error', result.message);
+          }
+        })
+        .withFailureHandler(function(error) {
+          hideLoading();
+          disableButtons(false);
+          showStatus('error', 'エラーが発生しました: ' + error.message);
+        })
+        .executeProofread(presentationId, proofreadType);
+    }
+    
+    // ローディング表示
+    function showLoading(message) {
+      document.getElementById('loadingMessage').textContent = message;
+      document.getElementById('loading').classList.add('active');
+      document.getElementById('status').style.display = 'none';
+    }
+    
+    // ローディング非表示
+    function hideLoading() {
+      document.getElementById('loading').classList.remove('active');
+    }
+    
+    // ステータス表示
+    function showStatus(type, message) {
+      const statusDiv = document.getElementById('status');
+      statusDiv.className = 'status ' + type;
+      statusDiv.textContent = message;
+      statusDiv.style.display = 'block';
+      
+      // 成功メッセージは5秒後に自動で消す
+      if (type === 'success') {
+        setTimeout(function() {
+          statusDiv.style.display = 'none';
+        }, 5000);
+      }
+    }
+    
+    // ボタンの有効/無効切り替え
+    function disableButtons(disabled) {
+      const buttons = document.querySelectorAll('button');
+      buttons.forEach(function(button) {
+        button.disabled = disabled;
+      });
+    }
+  </script>
+</body>
+</html>
