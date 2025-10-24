@@ -173,6 +173,34 @@
       margin-bottom: 5px;
     }
     
+    .extracted-id {
+      background: #fff3cd;
+      border-left: 4px solid #ffc107;
+      padding: 12px;
+      border-radius: 8px;
+      margin-top: 10px;
+      font-size: 13px;
+      color: #856404;
+      display: none;
+    }
+    
+    .extracted-id.active {
+      display: block;
+    }
+    
+    .extracted-id strong {
+      display: block;
+      margin-bottom: 5px;
+    }
+    
+    .extracted-id code {
+      background: #fff;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-family: monospace;
+      word-break: break-all;
+    }
+    
     .status {
       margin-top: 20px;
       padding: 15px;
@@ -272,14 +300,23 @@
         <h2>プレゼンテーション設定</h2>
         
         <div class="info-box">
-          <strong>📋 プレゼンテーションIDの取得方法：</strong>
-          Google SlidesのURLから取得してください。<br>
-          例: https://docs.google.com/presentation/d/<strong>PRESENTATION_ID</strong>/edit
+          <strong>📋 プレゼンテーションURLの取得方法:</strong>
+          Google SlidesのURLをそのままコピー&ペーストしてください。<br>
+          例: https://docs.google.com/presentation/d/<strong>PRESENTATION_ID</strong>/edit<br>
+          <em style="font-size: 12px; margin-top: 5px; display: block;">
+            ※プレゼンテーションIDのみの入力にも対応しています。
+            元のファイルを更新するので、元ファイルに更新権限が無いとエラーになります。
+          </em>
         </div>
         
         <div class="form-group">
-          <label for="presentationId">プレゼンテーションID *</label>
-          <input type="text" id="presentationId" placeholder="プレゼンテーションIDを入力してください">
+          <label for="presentationUrl">プレゼンテーションURL / ID *</label>
+          <input type="text" id="presentationUrl" placeholder="https://docs.google.com/presentation/d/PRESENTATION_ID/edit または PRESENTATION_ID">
+        </div>
+        
+        <div id="extractedId" class="extracted-id">
+          <strong>✓ 抽出されたプレゼンテーションID:</strong>
+          <code id="extractedIdValue"></code>
         </div>
         
         <button class="btn-secondary" onclick="loadPresentation()" style="width: 100%;">
@@ -303,8 +340,8 @@
             <option value="auto">自動検出</option>
             <option value="en">英語</option>
             <option value="ja">日本語</option>
-            <option value="zh-CN">中国語（簡体字）</option>
-            <option value="zh-TW">中国語（繁体字）</option>
+            <option value="zh-CN">中国語(簡体字)</option>
+            <option value="zh-TW">中国語(繁体字)</option>
             <option value="ko">韓国語</option>
             <option value="es">スペイン語</option>
             <option value="fr">フランス語</option>
@@ -317,8 +354,8 @@
           <select id="targetLang">
             <option value="ja">日本語</option>
             <option value="en">英語</option>
-            <option value="zh-CN">中国語（簡体字）</option>
-            <option value="zh-TW">中国語（繁体字）</option>
+            <option value="zh-CN">中国語(簡体字)</option>
+            <option value="zh-TW">中国語(繁体字)</option>
             <option value="ko">韓国語</option>
             <option value="es">スペイン語</option>
             <option value="fr">フランス語</option>
@@ -326,11 +363,11 @@
           </select>
         </div>
         
-        <div class="checkbox-group">
+       <div class="checkbox-group">
           <input type="checkbox" id="enableProofread" checked>
           <label for="enableProofread" style="margin-bottom: 0;">翻訳後に自動校正を実行する</label>
         </div>
-        
+
         <div class="button-group">
           <button class="btn-primary" onclick="startTranslation()">
             🌐 翻訳を実行
@@ -345,8 +382,8 @@
         <div class="form-group">
           <label for="proofreadType">校正方法</label>
           <select id="proofreadType">
-            <option value="basic">基本校正（Google翻訳ベース）</option>
-            <option value="databricks">高度な校正（Databricks API）</option>
+            <option value="basic">基本校正(Google翻訳ベース)</option>
+            <option value="databricks">高度な校正(Databricks API)</option>
           </select>
         </div>
         
@@ -368,14 +405,52 @@
   </div>
   
   <script>
+    // URLまたはIDからプレゼンテーションIDを抽出する関数
+    function extractPresentationId(input) {
+      if (!input) {
+        return null;
+      }
+      
+      // 入力値をトリミング
+      input = input.trim();
+      
+      // URLパターンからIDを抽出
+      // パターン1: https://docs.google.com/presentation/d/PRESENTATION_ID/edit...
+      const urlPattern1 = /\/presentation\/d\/([a-zA-Z0-9-_]+)/;
+      const match1 = input.match(urlPattern1);
+      if (match1) {
+        return match1[1];
+      }
+      
+      // パターン2: プレゼンテーションIDのみが入力された場合
+      // (英数字、ハイフン、アンダースコアのみで構成される文字列)
+      const idPattern = /^[a-zA-Z0-9-_]+$/;
+      if (idPattern.test(input)) {
+        return input;
+      }
+      
+      return null;
+    }
+    
     // プレゼンテーション情報を読み込む
     function loadPresentation() {
-      const presentationId = document.getElementById('presentationId').value.trim();
+      const inputValue = document.getElementById('presentationUrl').value.trim();
       
-      if (!presentationId) {
-        showStatus('error', 'プレゼンテーションIDを入力してください。');
+      if (!inputValue) {
+        showStatus('error', 'プレゼンテーションのURLまたはIDを入力してください。');
         return;
       }
+      
+      const presentationId = extractPresentationId(inputValue);
+      
+      if (!presentationId) {
+        showStatus('error', '有効なプレゼンテーションURLまたはIDを入力してください。');
+        return;
+      }
+      
+      // 抽出されたIDを表示
+      document.getElementById('extractedIdValue').textContent = presentationId;
+      document.getElementById('extractedId').classList.add('active');
       
       showLoading('プレゼンテーション情報を読み込んでいます...');
       
@@ -400,13 +475,20 @@
     
     // 翻訳を開始
     function startTranslation() {
-      const presentationId = document.getElementById('presentationId').value.trim();
+      const inputValue = document.getElementById('presentationUrl').value.trim();
       const sourceLang = document.getElementById('sourceLang').value;
       const targetLang = document.getElementById('targetLang').value;
       const enableProofread = document.getElementById('enableProofread').checked;
       
+      if (!inputValue) {
+        showStatus('error', 'プレゼンテーションのURLまたはIDを入力してください。');
+        return;
+      }
+      
+      const presentationId = extractPresentationId(inputValue);
+      
       if (!presentationId) {
-        showStatus('error', 'プレゼンテーションIDを入力してください。');
+        showStatus('error', '有効なプレゼンテーションURLまたはIDを入力してください。');
         return;
       }
       
@@ -415,7 +497,7 @@
         return;
       }
       
-      if (!confirm('翻訳を開始しますか？処理には時間がかかる場合があります。')) {
+      if (!confirm('翻訳を開始しますか? 処理には時間がかかる場合があります。')) {
         return;
       }
       
@@ -442,15 +524,22 @@
     
     // 校正を開始
     function startProofread() {
-      const presentationId = document.getElementById('presentationId').value.trim();
+      const inputValue = document.getElementById('presentationUrl').value.trim();
       const proofreadType = document.getElementById('proofreadType').value;
       
-      if (!presentationId) {
-        showStatus('error', 'プレゼンテーションIDを入力してください。');
+      if (!inputValue) {
+        showStatus('error', 'プレゼンテーションのURLまたはIDを入力してください。');
         return;
       }
       
-      if (!confirm('校正を開始しますか？処理には時間がかかる場合があります。')) {
+      const presentationId = extractPresentationId(inputValue);
+      
+      if (!presentationId) {
+        showStatus('error', '有効なプレゼンテーションURLまたはIDを入力してください。');
+        return;
+      }
+      
+      if (!confirm('校正を開始しますか? 処理には時間がかかる場合があります。')) {
         return;
       }
       
@@ -509,6 +598,24 @@
         button.disabled = disabled;
       });
     }
+    
+    // 入力フィールドの変更を監視してIDを表示
+    document.getElementById('presentationUrl').addEventListener('input', function() {
+      const inputValue = this.value.trim();
+      const extractedIdDiv = document.getElementById('extractedId');
+      
+      if (inputValue) {
+        const presentationId = extractPresentationId(inputValue);
+        if (presentationId) {
+          document.getElementById('extractedIdValue').textContent = presentationId;
+          extractedIdDiv.classList.add('active');
+        } else {
+          extractedIdDiv.classList.remove('active');
+        }
+      } else {
+        extractedIdDiv.classList.remove('active');
+      }
+    });
   </script>
 </body>
 </html>
